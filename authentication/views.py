@@ -21,7 +21,9 @@ class RegisterView(generics.GenericAPIView):
         print(request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        
         user_data = serializer.data
+        
         user = User.objects.get(email=user_data['email'])
         token = RefreshToken.for_user(user).access_token
         current_site = get_current_site(request).domain
@@ -34,30 +36,30 @@ class RegisterView(generics.GenericAPIView):
                 'email_subject': 'Verify your email'}
 
         Util.send_email(data)
-        send_mail(
-            absurl,
-            'Here is the message.',
-            'from@example.com',
-            [user.email],
-            fail_silently=False,
-        )
+        # send_mail(
+        #     absurl,
+        #     'Here is the message.',
+        #     'from@example.com',
+        #     [user.email],
+        #     fail_silently=False,
+        # )
 
         # print(user.email)
 
         return Response(user_data, status=status.HTTP_201_CREATED)
 
 
-class VerifyEmail(views.APIView):
+class VerifyEmail(generics.GenericAPIView):
     serializer_class = EmailVerificationSerializer
 
     def get(self, request):
         token = request.GET.get('token')
         try:
-            payload = jwt.decode(token, config('SECRET_KEY'))
+            payload = jwt.decode(token, options={"verify_signature": False})
             user = User.objects.get(id=payload['user_id'])
             if not user.is_verified:
                 user.is_verified = True
-                user.save(using=self._db)
+                user.save()
             return Response({'email': 'Successfully activated'}, status=status.HTTP_200_OK)
         except jwt.ExpiredSignatureError as identifier:
             return Response({'error': 'Activation Expired'}, status=status.HTTP_400_BAD_REQUEST)
