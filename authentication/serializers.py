@@ -11,7 +11,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'password']
+        fields = ['email', 'username', 'password', 'first_name',
+                  'last_name', 'zip_address', 'phone_number', 'about_me']
 
     def validate(self, attrs):
         email = attrs.get('email', '')
@@ -24,6 +25,28 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
+
+
+class ProRegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        max_length=30, min_length=6, write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['email', 'username', 'password', 'first_name',
+                  'last_name', 'zip_address', 'phone_number', 'about_me', 'company_name', 'for_gender', 'reserved_capacity']
+
+    def validate(self, attrs):
+        email = attrs.get('email', '')
+        username = attrs.get('username', '')
+
+        if not username.isalnum():
+            raise serializers.ValidationError(
+                self.default_error_messages)
+        return attrs
+
+    def create(self, validated_data):
+        return User.objects.create_prouser(**validated_data)
 
 
 class EmailVerificationSerializer(serializers.ModelSerializer):
@@ -60,17 +83,12 @@ class LoginSerializer(serializers.ModelSerializer):
         password = attrs.get('password', '')
         filtered_user_by_email = User.objects.filter(email=email)
         user = auth.authenticate(email=email, password=password)
-
-        # if filtered_user_by_email.exists() and filtered_user_by_email[0].auth_provider != 'email':
-        #     raise AuthenticationFailed(
-        #         detail='Please continue your login using ' + filtered_user_by_email[0].auth_provider)
-
         if not user:
             raise AuthenticationFailed('Invalid credentials, try again')
         if not user.is_active:
             raise AuthenticationFailed('Account disabled, contact admin')
-        # if not user.is_verified:
-        #     raise AuthenticationFailed('Email is not verified')
+        if not user.is_verified:
+            raise AuthenticationFailed('Email is not verified')
 
         return {
             'email': user.email,
