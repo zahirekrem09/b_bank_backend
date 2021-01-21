@@ -49,6 +49,10 @@ INSTALLED_APPS = [
     # 3.Party App
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    
+    # Swagger
+    # 'django.contrib.staticfiles',  # required for serving swagger ui's css/js files
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
