@@ -7,27 +7,55 @@ from django.utils import timezone
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, username, email, password=None):
+    def create_user(self, username,  email, first_name, last_name, zip_address, phone_number, about_me, password=None):
         if username is None:
             raise TypeError('Users should have a username')
         if email is None:
             raise TypeError('Users should have a Email')
 
         user = self.model(username=username,
-                          email=self.normalize_email(email))
-        user.set_password(password)
+                          email=self.normalize_email(email), first_name=first_name, last_name=last_name, zip_address=zip_address, phone_number=phone_number, about_me=about_me)
+        user.set_password(password,)
+        user.is_client = True
         user.save()
         return user
 
-    def create_superuser(self, username, email,  password=None):
+    def create_superuser(self, username, email, password=None):
         if password is None:
             raise TypeError('Password should not be none')
-
-        user = self.create_user(username, email,  password)
+        user = self.model(username=username,
+                          email=self.normalize_email(email))
+        user.set_password(password,)
         user.is_superuser = True
         user.is_staff = True
         user.is_active = True
         user.save(using=self._db)
+        return user
+
+    def create_prouser(self, username,  email, first_name, last_name, zip_address, phone_number, about_me, company_name, for_gender, reserved_capacity, password=None):
+        if username is None:
+            raise TypeError('Users should have a username')
+        if email is None:
+            raise TypeError('Users should have a Email')
+
+        user = self.model(username=username,
+                          email=self.normalize_email(email), first_name=first_name, last_name=last_name, zip_address=zip_address, phone_number=phone_number, about_me=about_me, company_name=company_name, for_gender=for_gender, reserved_capacity=reserved_capacity)
+        user.set_password(password,)
+        user.is_pro = True
+        user.save()
+        return user
+
+    def create_connectoruser(self, username,  email, first_name, last_name, zip_address, phone_number, about_me, password=None):
+        if username is None:
+            raise TypeError('Users should have a username')
+        if email is None:
+            raise TypeError('Users should have a Email')
+
+        user = self.model(username=username,
+                          email=self.normalize_email(email), first_name=first_name, last_name=last_name, zip_address=zip_address, phone_number=phone_number, about_me=about_me)
+        user.set_password(password,)
+        user.is_client = True
+        user.save()
         return user
 
 
@@ -67,15 +95,21 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=30, unique=True)
     email = models.EmailField(max_length=250, unique=True)
     first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30, blank=True, null=True)
+    last_name = models.CharField(max_length=30)
     birth_date = models.DateTimeField(blank=True, null=True)
     gender = models.IntegerField(choices=GENDER_CHOICES,
                                  default=GENDER_NOT_SPECIFIED)
     address = models.CharField(max_length=300,  blank=True, null=True)
     zip_address = models.CharField(max_length=8)
+    company_name = models.CharField(max_length=8, blank=True, null=True)
+    for_gender = models.IntegerField(choices=GENDER_CHOICES,
+                                     default=GENDER_NOT_SPECIFIED)
+    schedule_for_client = models.DateTimeField(auto_now=True)
+    schedule_for_connector = models.DateTimeField(auto_now=True)
+    reserved_capacity = models.IntegerField(default=0)
     latitude = models.CharField(max_length=200, blank=True, null=True)
     longitude = models.CharField(max_length=200, blank=True, null=True)
-    phone_number = models.CharField(max_length=16, blank=True, null=True)
+    phone_number = models.CharField(max_length=16)
     phone_number2 = models.CharField(max_length=16, blank=True, null=True)
     about_me = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -91,6 +125,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_gray = models.BooleanField(default=False)
+    is_client = models.BooleanField(default=False)
+    is_pro = models.BooleanField(default=False)
+    is_connector = models.BooleanField(default=False)
     gdpr_consent = models.BooleanField(default=False)
 
     objects = UserManager()

@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     # 3.Party App
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
-    
+
     # Swagger
     # 'django.contrib.staticfiles',  # required for serving swagger ui's css/js files
     'drf_yasg',
@@ -148,5 +148,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "farukcihan20@gmail.com"
-EMAIL_HOST_PASSWORD = "123456fC."
+EMAIL_HOST_USER = "bbankdummymail@gmail.com"
+EMAIL_HOST_PASSWORD = "bbank1212"
