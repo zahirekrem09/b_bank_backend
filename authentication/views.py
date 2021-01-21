@@ -1,9 +1,6 @@
-<<<<<<< HEAD
 from .serializers import (RegisterSerializer, EmailVerificationSerializer,
-                          LoginSerializer, LogoutSerializer, ProRegisterSerializer)
-=======
-from .serializers import RegisterSerializer, EmailVerificationSerializer, LoginSerializer, LogoutSerializer, ResetPasswordEmailRequestSerializer, SetNewPasswordSerializer
->>>>>>> 4b0da94... add reset-password-by-email
+                          LoginSerializer, LogoutSerializer, ResetPasswordEmailRequestSerializer, 
+                          SetNewPasswordSerializer, ProRegisterSerializer)
 from .models import User
 from django.shortcuts import render
 from django.contrib.sites.shortcuts import get_current_site
@@ -30,13 +27,7 @@ class RegisterView(generics.GenericAPIView):
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-<<<<<<< HEAD
-
         user_data = serializer.data
-
-=======
-        user_data = serializer.data
->>>>>>> 4b0da94... add reset-password-by-email
         user = User.objects.get(email=user_data['email'])
         
         token = RefreshToken.for_user(user).access_token
@@ -50,7 +41,6 @@ class RegisterView(generics.GenericAPIView):
                 'email_subject': 'Verify your email'}
 
         Util.send_email(data)
-<<<<<<< HEAD
 
         return Response(user_data, status=status.HTTP_201_CREATED)
 
@@ -78,8 +68,6 @@ class ProRegisterView(generics.GenericAPIView):
 
         Util.send_email(data)
 
-=======
->>>>>>> 4b0da94... add reset-password-by-email
         return Response(user_data, status=status.HTTP_201_CREATED)
 
 
