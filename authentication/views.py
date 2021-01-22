@@ -1,5 +1,5 @@
 from .serializers import (RegisterSerializer, EmailVerificationSerializer,
-                          LoginSerializer, LogoutSerializer, ResetPasswordEmailRequestSerializer, 
+                          LoginSerializer, LogoutSerializer, ResetPasswordEmailRequestSerializer,
                           SetNewPasswordSerializer, ProRegisterSerializer)
 from .models import User
 from django.shortcuts import render
@@ -23,15 +23,14 @@ class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
     def post(self, request):
-        user = request.data
-        serializer = self.serializer_class(data=user)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         user_data = serializer.data
         user = User.objects.get(email=user_data['email'])
-        
+        user.is_client = True
+        user.save()
         token = RefreshToken.for_user(user).access_token
-        
         current_site = get_current_site(request).domain
         relativeLink = reverse('email-verify')
         absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
@@ -40,7 +39,34 @@ class RegisterView(generics.GenericAPIView):
         data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
 
-        Util.send_email(data)
+        # Util.send_email(data)
+        print(f"user in db {user}")
+
+        return Response(user_data, status=status.HTTP_201_CREATED)
+
+
+class ConnectorRegisterView(generics.GenericAPIView):
+    serializer_class = RegisterSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        user_data = serializer.data
+        user = User.objects.get(email=user_data['email'])
+        user.is_connector = True
+        user.save()
+        token = RefreshToken.for_user(user).access_token
+        current_site = get_current_site(request).domain
+        relativeLink = reverse('email-verify')
+        absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
+        email_body = 'Hi '+user.username + \
+            ' Use the link below to verify your email \n' + absurl
+        data = {'email_body': email_body, 'to_email': user.email,
+                'email_subject': 'Verify your email'}
+
+        # Util.send_email(data)
+        print(f"user in db {user}")
 
         return Response(user_data, status=status.HTTP_201_CREATED)
 
@@ -49,14 +75,17 @@ class ProRegisterView(generics.GenericAPIView):
     serializer_class = ProRegisterSerializer
 
     def post(self, request):
-        user = request.data
-        serializer = self.serializer_class(data=user)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
         user_data = serializer.data
-
         user = User.objects.get(email=user_data['email'])
+        user.is_pro = True
+        user.company_name = request.data['company_name']
+        user.for_gender = request.data['for_gender']
+        user.reserved_capacity = request.data['reserved_capacity']
+        user.save()
+
         token = RefreshToken.for_user(user).access_token
         current_site = get_current_site(request).domain
         relativeLink = reverse('email-verify')
@@ -66,7 +95,8 @@ class ProRegisterView(generics.GenericAPIView):
         data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
 
-        Util.send_email(data)
+        # Util.send_email(data)
+        print(f"user in db {user.company_name}")
 
         return Response(user_data, status=status.HTTP_201_CREATED)
 
@@ -115,20 +145,22 @@ class LogoutAPIView(generics.GenericAPIView):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 class RequestPasswordResetEmail(generics.GenericAPIView):
     serializer_class = ResetPasswordEmailRequestSerializer
-    
+
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        
+
         email = request.data['email']
-        
+
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
             uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
             token = PasswordResetTokenGenerator().make_token(user)
             current_site = get_current_site(request=request).domain
-            relativeLink = reverse('password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token})
+            relativeLink = reverse(
+                'password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token})
             absurl = 'http://'+current_site+relativeLink
             email_body = 'Hello '+user.username + \
                 ' Use the link below to reset your password \n' + absurl
@@ -137,26 +169,27 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
 
             Util.send_email(data)
         return Response({'success': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
-        
+
 
 class PasswordTokenCheckAPI(generics.GenericAPIView):
     def get(self, request, uidb64, token):
-        
+
         try:
             id = smart_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(id=id)
-            
+
             if not PasswordResetTokenGenerator().check_token(user, token):
                 return Response({'error': 'Token is not valid, please request a new one'}, status=status.HTTP_401_UNAUTHORIZED)
-                
+
             return Response({'success': True, 'message': 'Credentials Valid', 'uidb64': uidb64, 'token': token})
-        
+
         except DjangoUnicodeDecodeError as identifier:
             return Response({'error': 'Token is not valid, please request a new one'}, status=status.HTTP_401_UNAUTHORIZED)
-        
+
+
 class SetNewPasswordAPIView(generics.GenericAPIView):
     serializer_class = SetNewPasswordSerializer
-    
+
     def patch(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
