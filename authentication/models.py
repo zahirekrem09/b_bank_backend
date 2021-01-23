@@ -101,7 +101,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                                  default=GENDER_NOT_SPECIFIED)
     address = models.CharField(max_length=300,  blank=True, null=True)
     zip_address = models.CharField(max_length=8)
-    company_name = models.CharField(max_length=8, blank=True, null=True)
+    company_name = models.CharField(max_length=100, blank=True, null=True)
     for_gender = models.IntegerField(choices=GENDER_CHOICES,
                                      default=GENDER_NOT_SPECIFIED)
     schedule_for_client = models.DateTimeField(auto_now=True)
@@ -109,9 +109,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     reserved_capacity = models.IntegerField(default=0)
     latitude = models.CharField(max_length=200, blank=True, null=True)
     longitude = models.CharField(max_length=200, blank=True, null=True)
-    phone_number = models.CharField(max_length=16)
-    phone_number2 = models.CharField(max_length=16, blank=True, null=True)
-    about_me = models.TextField(max_length=500)
+    phone_number = models.CharField(max_length=20)
+    phone_number2 = models.CharField(max_length=20, blank=True, null=True)
+    about_me = models.TextField(max_length=1500)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     transportation_type = models.IntegerField(
@@ -119,7 +119,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     preferred_lang = models.IntegerField(
         choices=PREFERREND_LANG_CHOICES, default=PREFERREND_LANG_NOT_SPECIFIED)
     expectation = models.CharField(max_length=200, blank=True, null=True)
-    profile_image = models.ImageField(null=True)
+    profile_image = models.ImageField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_verified = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)

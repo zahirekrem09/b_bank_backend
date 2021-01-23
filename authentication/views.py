@@ -1,6 +1,6 @@
 from .serializers import (RegisterSerializer, EmailVerificationSerializer,
                           LoginSerializer, LogoutSerializer, ResetPasswordEmailRequestSerializer,
-                          SetNewPasswordSerializer, ProRegisterSerializer)
+                          SetNewPasswordSerializer, ProRegisterSerializer, UserDetailSerializer)
 from .models import User
 from django.shortcuts import render
 from django.contrib.sites.shortcuts import get_current_site
@@ -194,3 +194,14 @@ class SetNewPasswordAPIView(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response({'success': True, 'message': 'Password reset success'}, status=status.HTTP_200_OK)
+
+
+class UserDetail(generics.ListAPIView):
+    serializer_class = UserDetailSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        username = self.kwargs["username"]
+        queryset = queryset.filter(username=username)
+        return queryset
