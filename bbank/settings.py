@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import django_heroku
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
     # Swagger
     # 'django.contrib.staticfiles',  # required for serving swagger ui's css/js files
     'drf_yasg',
+    'corsheaders',
 ]
 
 SWAGGER_SETTINGS = {
@@ -160,3 +162,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = "bbankdummymail@gmail.com"
 EMAIL_HOST_PASSWORD = "bbank1212"
+
+
+CORS_ALLOW_ALL_ORIGINS = True
+# Activate Django-Heroku.
+django_heroku.settings(locals())

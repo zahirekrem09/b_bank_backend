@@ -39,8 +39,8 @@ class RegisterView(generics.GenericAPIView):
         data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
 
-        # Util.send_email(data)
-        print(f"user in db {user}")
+        Util.send_email(data)
+        # print(f"user in db {user}")
 
         return Response(user_data, status=status.HTTP_201_CREATED)
 
@@ -65,8 +65,8 @@ class ConnectorRegisterView(generics.GenericAPIView):
         data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
 
-        # Util.send_email(data)
-        print(f"user in db {user}")
+        Util.send_email(data)
+        # print(f"user in db {user}")
 
         return Response(user_data, status=status.HTTP_201_CREATED)
 
@@ -95,8 +95,8 @@ class ProRegisterView(generics.GenericAPIView):
         data = {'email_body': email_body, 'to_email': user.email,
                 'email_subject': 'Verify your email'}
 
-        # Util.send_email(data)
-        print(f"user in db {user.company_name}")
+        Util.send_email(data)
+        # print(f"user in db {user.company_name}")
 
         return Response(user_data, status=status.HTTP_201_CREATED)
 
