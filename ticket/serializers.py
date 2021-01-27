@@ -11,8 +11,10 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 class TicketClientDetailSerializer(serializers.ModelSerializer):
-    owner = UserTicketOwnerSerializer()
+    owner = UserTicketOwnerSerializer(read_only=True)
     # pro_company_name = serializers.SerializerMethodField()
+    pro = serializers.CharField(read_only=True)
+    # TODO girilen pro ya göre pronun comp. name eklenecek
 
     class Meta:
         model = Ticket

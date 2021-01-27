@@ -167,7 +167,20 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 
 class UserTicketOwnerSerializer(serializers.ModelSerializer):
+    gender = serializers.SerializerMethodField()
+    transportation_type = serializers.SerializerMethodField()
+    preferred_lang = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ("id", "username", "email", "first_name",
                   "last_name", "gender", "zip_address", "phone_number", "phone_number2", "about_me", "transportation_type", "preferred_lang", "gdpr_consent", "is_gray")
+
+    def get_gender(self, obj):
+        return obj.get_gender_display()
+
+    def get_transportation_type(self, obj):
+        return obj.get_transportation_type_display()
+
+    def get_preferred_lang(self, obj):
+        return obj.get_preferred_lang_display()
