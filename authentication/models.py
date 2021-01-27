@@ -127,6 +127,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_gray = models.BooleanField(default=False)
     is_client = models.BooleanField(default=False)
     is_pro = models.BooleanField(default=False)
+    is_sponsor = models.BooleanField(default=False)
     is_connector = models.BooleanField(default=False)
     gdpr_consent = models.BooleanField(default=False)
 
