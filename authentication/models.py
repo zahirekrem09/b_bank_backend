@@ -92,10 +92,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     )
 
-    username = models.CharField(max_length=30, unique=True)
+    username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=250, unique=True)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
     birth_date = models.DateTimeField(blank=True, null=True)
     gender = models.IntegerField(choices=GENDER_CHOICES,
                                  default=GENDER_NOT_SPECIFIED)

@@ -163,3 +163,11 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+        lookup_field = "username"
+
+
+class UserTicketOwnerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "email", "first_name",
+                  "last_name", "gender", "zip_address", "phone_number", "phone_number2", "about_me", "transportation_type", "preferred_lang", "gdpr_consent", "is_gray")

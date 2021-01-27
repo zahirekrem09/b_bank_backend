@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
     # my App
     'authentication',
+    "ticket",
 
     # 3.Party App
     'rest_framework',

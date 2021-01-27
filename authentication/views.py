@@ -17,7 +17,7 @@ from drf_yasg import openapi
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from .permission import IsOwnerOrReadOnly
+from .permission import IsCurrentUser
 
 
 class RegisterView(generics.GenericAPIView):
@@ -225,7 +225,8 @@ class SetNewPasswordAPIView(generics.GenericAPIView):
 
 class UserDetail(generics.RetrieveUpdateAPIView):
     serializer_class = UserDetailSerializer
-    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
+    permission_classes = (permissions.IsAuthenticated, IsCurrentUser)
+    lookup_field = 'username'
     # TODO: Custom permission
 
     def get_queryset(self):
