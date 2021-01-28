@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .serializers import (TicketSerializer, TicketClientDetailSerializer)
+from .serializers import (TicketSerializer, TicketClientDetailSerializer, TicketConnectorDetailSerializer)
 from .models import Ticket
 from django.shortcuts import render
 from .permission import IsOwnerOrReadOnly
@@ -13,8 +13,14 @@ class TicketsView(generics.ListCreateAPIView):
     queryset = Ticket.objects.all()
 
 
-class TicketsDetailView(generics.RetrieveUpdateAPIView):
+class ClientTicketsDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = TicketClientDetailSerializer
     permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
+    queryset = Ticket.objects.all()
+    lookup_field = 'id'
+
+class ConnectorTicketsDetailView(generics.RetrieveUpdateAPIView):
+    serializer_class = TicketConnectorDetailSerializer
+    # permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
     queryset = Ticket.objects.all()
     lookup_field = 'id'
