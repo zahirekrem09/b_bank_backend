@@ -5,7 +5,14 @@ from authentication.serializers import UserTicketOwnerSerializer
 from authentication.models import User
 
 
+class Pro(serializers.PrimaryKeyRelatedField):
+
+    def display_value(self, instance):
+        return instance.username
+
+
 class TicketSerializer(serializers.ModelSerializer):
+    owner = UserTicketOwnerSerializer(read_only=True)
 
     class Meta:
         model = Ticket
@@ -14,27 +21,25 @@ class TicketSerializer(serializers.ModelSerializer):
 
 class TicketClientDetailSerializer(serializers.ModelSerializer):
     owner = UserTicketOwnerSerializer(read_only=True)
-    # pro_company_name = serializers.SerializerMethodField()
-    pro = serializers.CharField(read_only=True)
-    # TODO girilen pro ya göre pronun comp. name eklenecek
 
     class Meta:
         model = Ticket
-        fields = ("id", "owner", "pro",
-                  "appointment_date", "feedback_client")
+        fields = ("id", "owner",
+                  "feedback_client")
 
-class Pro(serializers.PrimaryKeyRelatedField):
-    
-    def display_value(self, instance):
-        return instance.username
 
 class TicketConnectorDetailSerializer(serializers.ModelSerializer):
-    # owner = UserTicketOwnerSerializer(read_only=True)
-    # pro_company_name = serializers.SerializerMethodField()
     pro = Pro(queryset=User.objects.filter(is_pro=True))
-    # TODO girilen pro ya göre pronun comp. name eklenecek
+    connector = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Ticket
-        fields = ("id", "owner", "pro",
+        fields = ("id", "owner", "pro", "connector",
                   "appointment_date", "feedback_client", "comments_connector")
+
+    def get_connector(self, obj):
+        request = self.context['request']
+        if request.user.is_authenticated:
+            if obj.connector == request.user.username:
+                return True
+            return False
