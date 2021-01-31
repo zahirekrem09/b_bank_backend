@@ -16,8 +16,8 @@ class CreateTicketsView(APIView):
 
     def post(self, request, **extra):
         owner = User.objects.get(username=request.user.username)
-        print(owner)
-        Ticket.objects.create(owner=owner, **extra)
+        Ticket.objects.create(owner=owner, email=owner.email,
+                              first_name=owner.first_name, last_name=owner.last_name, phone_number=owner.phone_number, about_me=owner.about_me, ** extra)
 
         data = {
             "messages": "Create Ticket Successfuly"
@@ -50,7 +50,6 @@ class ClientTicketsDetailView(generics.UpdateAPIView):
 
 class ConnectorTicketsDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = TicketConnectorDetailSerializer
-    permission_classes = (permissions.IsAuthenticated, IsConnectorUser)
-    # TODO: connector permission yazılıcak
+    # permission_classes = (permissions.IsAuthenticated, IsConnectorUser)
     queryset = Ticket.objects.all()
     lookup_field = 'id'

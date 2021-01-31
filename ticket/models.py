@@ -3,17 +3,23 @@ from authentication.models import User
 
 
 class Ticket(models.Model):
+   # TODO: tickete göre değişicek
     owner = models.ForeignKey(
         User, related_name='owner', on_delete=models.CASCADE)
+    email = models.EmailField(max_length=250)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=20)
+    phone_number2 = models.CharField(max_length=20, blank=True, null=True)
+    about_me = models.TextField(max_length=1500)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     appointment_date = models.DateTimeField(null=True, blank=True)
     ticket_received = models.BooleanField(default=False)
-    connector = models.CharField(max_length=50, blank=True, null=True)
-    pro = models.CharField(max_length=50, blank=True, null=True)
+    connector = models.PositiveIntegerField(blank=True, null=True)
+    pro = models.PositiveIntegerField(blank=True, null=True)
     distance = models.IntegerField(default=0)
-    date_sent_client = models.DateTimeField(null=True, blank=True)
-    date_sent_pro = models.DateTimeField(null=True, blank=True)
-    feedback_client = models.TextField(blank=True, null=True)
-    feedback_pro = models.TextField(blank=True, null=True)
-    comments_connector = models.TextField(blank=True, null=True)
+    terms_approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.email

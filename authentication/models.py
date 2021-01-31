@@ -58,6 +58,8 @@ class UserManager(BaseUserManager):
         user.save()
         return user
 
+# TODO : social media link eklenecek
+
 
 class User(AbstractBaseUser, PermissionsMixin):
 
@@ -71,6 +73,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     PREFERREND_LANG_DUTCH = 0
     PREFERREND_LANG_ENG = 1
     PREFERREND_LANG_NOT_SPECIFIED = 2
+    SERVICE_TYPE_KAPPER = 0
+    SERVICE_TYPE_SCHOONHEIDSSPECIALISTE = 1
+    SERVICE_TYPE_PEDICURE = 2
+    SERVICE_TYPE_VISAGIST = 3
+    SERVICE_TYPE_STYLISTE = 4
+    SERVICE_TYPE_NAGELSTYLISTE = 5
+    SERVICE_TYPE_HAARWERKEN = 6
+    SERVICE_TYPE_NOT_SPECIFIED = 7
 
     GENDER_CHOICES = (
         (GENDER_MALE, 'male'),
@@ -91,6 +101,17 @@ class User(AbstractBaseUser, PermissionsMixin):
         (PREFERREND_LANG_NOT_SPECIFIED, 'not specified'),
 
     )
+    SERVICE_TYPE_CHOICES = (
+        (SERVICE_TYPE_KAPPER, 'kapper'),
+        (SERVICE_TYPE_SCHOONHEIDSSPECIALISTE, 'schoonheidsspecialiste'),
+        (SERVICE_TYPE_PEDICURE, 'pedicure'),
+        (SERVICE_TYPE_VISAGIST, 'visagist'),
+        (SERVICE_TYPE_STYLISTE, 'styliste'),
+        (SERVICE_TYPE_NAGELSTYLISTE, 'nagelstyliste'),
+        (SERVICE_TYPE_HAARWERKEN, 'haarwerken'),
+        (SERVICE_TYPE_NOT_SPECIFIED, 'not specified'),
+
+    )
 
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=250, unique=True)
@@ -102,6 +123,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     address = models.CharField(max_length=300,  blank=True, null=True)
     zip_address = models.CharField(max_length=8)
     company_name = models.CharField(max_length=100, blank=True, null=True)
+    service_type = models.IntegerField(choices=SERVICE_TYPE_CHOICES,
+                                       default=SERVICE_TYPE_NOT_SPECIFIED)
     for_gender = models.IntegerField(choices=GENDER_CHOICES,
                                      default=GENDER_NOT_SPECIFIED)
     schedule_for_client = models.DateTimeField(auto_now=True)
@@ -111,6 +134,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     longitude = models.CharField(max_length=200, blank=True, null=True)
     phone_number = models.CharField(max_length=20)
     phone_number2 = models.CharField(max_length=20, blank=True, null=True)
+    twitter_account = models.URLField(max_length=300, blank=True, null=True)
+    instagram_account = models.URLField(max_length=300, blank=True, null=True)
+    facebook_account = models.URLField(max_length=300, blank=True, null=True)
+    youtube_account = models.URLField(max_length=300, blank=True, null=True)
     about_me = models.TextField(max_length=1500)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
