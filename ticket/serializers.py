@@ -1,6 +1,6 @@
 from django.db.models.query import QuerySet
 from rest_framework import serializers
-from .models import Ticket
+from .models import FeedBackImage, Feedback, Ticket
 from authentication.serializers import UserTicketOwnerSerializer
 from authentication.models import User
 from authentication.utils import Util
@@ -14,7 +14,6 @@ from authentication.utils import Util
 
 if User.objects.filter(is_pro=True).exists():
     pro_user = [(u.id, u.username) for u in User.objects.filter(is_pro=True)]
-
 else:
     pro_user = []
 
@@ -58,5 +57,26 @@ class TicketConnectorDetailSerializer(serializers.ModelSerializer):
 
         instance.appointment_date = request.data.get("appointment_date")
         instance.save()
-        print(request.data)
+        # print(request.data)
         return instance
+
+
+class FeedbackCreateSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = ("content",)
+
+
+class FeedbackSerializers(serializers.ModelSerializer):
+    owner = UserTicketOwnerSerializer(read_only=True)
+    ticket = TicketClientDetailSerializer(read_only=True)
+
+    class Meta:
+        model = Feedback
+        fields = "__all__"
+
+
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FeedBackImage
+        fields = ('image',)

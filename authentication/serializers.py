@@ -37,7 +37,7 @@ class ProRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'username', 'password', 'first_name',
-                  'last_name', 'zip_address', 'phone_number', 'about_me', 'company_name', 'for_gender', 'reserved_capacity', 'service_type ', 'twitter_account', 'instagram_account', 'facebook_account', 'youtube_account']
+                  'last_name', 'zip_address', 'phone_number', 'about_me', 'company_name', 'for_gender', 'reserved_capacity', 'service_type', 'twitter_account', 'instagram_account', 'facebook_account', 'youtube_account']
 
     def validate(self, attrs):
         email = attrs.get('email', '')

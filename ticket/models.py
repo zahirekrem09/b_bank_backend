@@ -2,6 +2,8 @@ from django.db import models
 from authentication.models import User
 
 
+# def user_directory_path(instance, filename):
+#     return 'ticket/{0}/{1}'.format(instance.owner.id, filename)
 class Ticket(models.Model):
    # TODO: tickete göre değişicek
     owner = models.ForeignKey(
@@ -21,5 +23,20 @@ class Ticket(models.Model):
     distance = models.IntegerField(default=0)
     terms_approved = models.BooleanField(default=False)
 
-    def __str__(self):
-        return self.email
+    # def __str__(self):
+    #     return self.email
+
+
+class Feedback(models.Model):
+    owner = models.ForeignKey(
+        User, related_name='feedbacks', on_delete=models.CASCADE)
+    ticket = models.ForeignKey(
+        Ticket, related_name='feedbacks', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    content = models.TextField(max_length=1500)
+
+
+class FeedBackImage(models.Model):
+    image = models.ImageField(upload_to='feedbacks_images')
+    feedback = models.ForeignKey(Feedback, on_delete=models.CASCADE)
