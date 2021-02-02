@@ -11,11 +11,15 @@ from authentication.utils import Util
 #     def display_value(self, instance):
 #         return instance.username
 
+def pro_user_feild():
 
-if User.objects.filter(is_pro=True).exists():
-    pro_user = [(u.id, u.username) for u in User.objects.filter(is_pro=True)]
-else:
-    pro_user = []
+    if User.objects.filter(is_pro=True).exists():
+        pro_user = [(u.id, u.username)
+                    for u in User.objects.filter(is_pro=True)]
+    else:
+        pro_user = []
+
+    return pro_user
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -35,7 +39,7 @@ class TicketClientDetailSerializer(serializers.ModelSerializer):
 
 
 class TicketConnectorDetailSerializer(serializers.ModelSerializer):
-    pro = serializers.ChoiceField(choices=pro_user)
+    pro = serializers.ChoiceField(choices=pro_user_feild)
     connector = serializers.IntegerField(read_only=True)
 
     class Meta:
