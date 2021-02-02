@@ -10,7 +10,7 @@ from authentication.utils import Util
 
 #     def display_value(self, instance):
 #         return instance.username
-# TODO : if else koyulucak
+
 
 if User.objects.filter(is_pro=True).exists():
     pro_user = [(u.id, u.username) for u in User.objects.filter(is_pro=True)]

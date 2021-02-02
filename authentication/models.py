@@ -7,14 +7,14 @@ from django.utils import timezone
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, username,  email, first_name, last_name, zip_address, phone_number, about_me, password=None, **extra):
+    def create_user(self, username,  email, first_name, last_name, gdpr_consent,phone_number, password=None, **extra):
         if username is None:
             raise TypeError('Users should have a username')
         if email is None:
             raise TypeError('Users should have a Email')
 
         user = self.model(username=username,
-                          email=self.normalize_email(email), first_name=first_name, last_name=last_name, zip_address=zip_address, phone_number=phone_number, about_me=about_me)
+                          email=self.normalize_email(email), first_name=first_name, last_name=last_name,phone_number = phone_number, gdpr_consent=gdpr_consent)
         user.set_password(password,)
         # user.is_client = True
         user.save()
