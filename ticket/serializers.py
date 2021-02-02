@@ -39,7 +39,7 @@ class TicketClientDetailSerializer(serializers.ModelSerializer):
 
 
 class TicketConnectorDetailSerializer(serializers.ModelSerializer):
-    pro = serializers.ChoiceField(choices=pro_user_feild)
+    pro = serializers.ChoiceField(choices=pro_user_feild())
     connector = serializers.IntegerField(read_only=True)
 
     class Meta:
