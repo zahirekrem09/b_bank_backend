@@ -53,11 +53,12 @@ INSTALLED_APPS = [
     # 3.Party App
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'corsheaders',
 
     # Swagger
     # 'django.contrib.staticfiles',  # required for serving swagger ui's css/js files
     'drf_yasg',
-    'corsheaders',
+
 ]
 
 SWAGGER_SETTINGS = {
@@ -73,6 +74,7 @@ SWAGGER_SETTINGS = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -176,3 +178,19 @@ EMAIL_HOST_PASSWORD = "bbank1212"
 CORS_ALLOW_ALL_ORIGINS = True
 # Activate Django-Heroku.
 django_heroku.settings(locals())
+
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_HEADERS = (
+    'x-requested-with',
+    'content-type',
+    'accept',
+    'origin',
+    'authorization',
+    'accept-encoding',
+    'x-csrftoken',
+    'access-control-allow-origin',
+    'content-disposition'
+)
+CORS_ALLOW_CREDENTIALS = False
+CORS_ALLOW_METHODS = ('GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS')
