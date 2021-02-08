@@ -15,7 +15,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'username', 'password', 'first_name',
-                  'last_name', 'phone_number','gdpr_consent' ]
+                  'last_name', 'phone_number', 'gdpr_consent']
 
     def validate(self, attrs):
         email = attrs.get('email', '')
@@ -37,7 +37,7 @@ class ProRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'username', 'password', 'first_name',
-                  'last_name', 'zip_address', 'phone_number', 'about_me', 'company_name', 'for_gender', 'reserved_capacity', 'service_type','gdpr_consent']
+                  'last_name', 'zip_address', 'phone_number', 'about_me', 'company_name', 'for_gender', 'reserved_capacity', 'service_type', 'gdpr_consent']
 
     def validate(self, attrs):
         email = attrs.get('email', '')
@@ -68,6 +68,7 @@ class LoginSerializer(serializers.ModelSerializer):
         max_length=255, min_length=3, read_only=True)
 
     tokens = serializers.SerializerMethodField()
+    role = serializers.SerializerMethodField(read_only=True)
 
     def get_tokens(self, obj):
         user = User.objects.get(email=obj['email'])
@@ -77,9 +78,27 @@ class LoginSerializer(serializers.ModelSerializer):
             'access': user.tokens()['access']
         }
 
+    def get_role(self, obj):
+        user = User.objects.get(email=obj['email'])
+
+        if user.is_pro:
+            return "Pro"
+
+        elif user.is_client:
+            return "Client"
+
+        elif user.is_sponsor:
+            return "Sponsor"
+
+        elif user.is_connector:
+            return "Connector"
+
+        else:
+            return "Admin"
+
     class Meta:
         model = User
-        fields = ['email', 'password', 'username', 'tokens']
+        fields = ['email', 'password', 'username', 'tokens', 'role']
 
     def validate(self, attrs):
         email = attrs.get('email', '')
