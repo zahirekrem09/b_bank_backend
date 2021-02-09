@@ -58,7 +58,6 @@ class UserManager(BaseUserManager):
         user.save()
         return user
 
-# TODO : social media link eklenecek
 
 
 class User(AbstractBaseUser, PermissionsMixin):

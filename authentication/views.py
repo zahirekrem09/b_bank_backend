@@ -1,15 +1,13 @@
 from .serializers import (RegisterSerializer, EmailVerificationSerializer,
                           LoginSerializer, LogoutSerializer, ResetPasswordEmailRequestSerializer,
-                          SetNewPasswordSerializer, ProRegisterSerializer, UserDetailSerializer)
+                          SetNewPasswordSerializer, ProRegisterSerializer, UserDetailSerializer, MyTokenObtainPairSerializer)
 from .models import User
-from django.shortcuts import render
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from rest_framework import generics, status, views, permissions
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .utils import Util
-from django.core.mail import EmailMessage, send_mail
 import jwt
 from decouple import config
 from drf_yasg.utils import swagger_auto_schema
@@ -18,6 +16,15 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from .permission import IsCurrentUser
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.core.mail import EmailMultiAlternatives
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+
+class MyObtainTokenPairView(TokenObtainPairView):
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = MyTokenObtainPairSerializer
 
 
 class RegisterView(generics.GenericAPIView):
@@ -31,17 +38,29 @@ class RegisterView(generics.GenericAPIView):
         user = User.objects.get(email=user_data['email'])
         user.is_client = True
         user.save()
-        token = RefreshToken.for_user(user).access_token
-        current_site = get_current_site(request).domain
-        relativeLink = reverse('email-verify')
-        absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
-        email_body = 'Hi '+user.username + \
-            ' Use the link below to verify your email \n' + absurl
-        data = {'email_body': email_body, 'to_email': user.email,
-                'email_subject': 'Verify your email'}
+        # token = RefreshToken.for_user(user).access_token
+        # current_site = get_current_site(request).domain
+        # relativeLink = reverse('email-verify')
+        # absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
+        # email_body = 'Hi '+user.username + \
+        #     ' Use the link below to verify your email \n' + absurl
+        # data = {'email_body': email_body, 'to_email': user.email,
+        #         'email_subject': 'Verify your email'}
 
-        Util.send_email(data)
+        # Util.send_email(data)
         # print(f"user in db {user}")
+        FRONTEND_URL = "http://localhost:3000"
+
+        token = RefreshToken.for_user(user).access_token
+        verify_link = FRONTEND_URL + '/email-verify/' + str(token)
+        subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
+        current_site = get_current_site(request).domain
+        html_content = render_to_string('verify_email.html', {
+                                        'verify_link': verify_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': user})
+        text_content = strip_tags(html_content)
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
 
         return Response(user_data, status=status.HTTP_201_CREATED)
 
@@ -56,18 +75,19 @@ class ConnectorRegisterView(generics.GenericAPIView):
         user_data = serializer.data
         user = User.objects.get(email=user_data['email'])
         user.is_connector = True
-        user.save()
-        token = RefreshToken.for_user(user).access_token
-        current_site = get_current_site(request).domain
-        relativeLink = reverse('email-verify')
-        absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
-        email_body = 'Hi '+user.username + \
-            ' Use the link below to verify your email \n' + absurl
-        data = {'email_body': email_body, 'to_email': user.email,
-                'email_subject': 'Verify your email'}
+        user.save()    
+        FRONTEND_URL = "http://localhost:3000"
 
-        Util.send_email(data)
-        # print(f"user in db {user}")
+        token = RefreshToken.for_user(user).access_token
+        verify_link = FRONTEND_URL + '/email-verify/' + str(token)
+        subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
+        current_site = get_current_site(request).domain
+        html_content = render_to_string('verify_email.html', {
+                                        'verify_link': verify_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': user})
+        text_content = strip_tags(html_content)
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
 
         return Response(user_data, status=status.HTTP_201_CREATED)
 
@@ -83,17 +103,18 @@ class SponsorRegisterView(generics.GenericAPIView):
         user = User.objects.get(email=user_data['email'])
         user.is_sponsor = True
         user.save()
-        token = RefreshToken.for_user(user).access_token
-        current_site = get_current_site(request).domain
-        relativeLink = reverse('email-verify')
-        absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
-        email_body = 'Hi '+user.username + \
-            ' Use the link below to verify your email \n' + absurl
-        data = {'email_body': email_body, 'to_email': user.email,
-                'email_subject': 'Verify your email'}
+        FRONTEND_URL = "http://localhost:3000"
 
-        Util.send_email(data)
-        # print(f"user in db {user}")
+        token = RefreshToken.for_user(user).access_token
+        verify_link = FRONTEND_URL + '/email-verify/' + str(token)
+        subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
+        current_site = get_current_site(request).domain
+        html_content = render_to_string('verify_email.html', {
+                                        'verify_link': verify_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': user})
+        text_content = strip_tags(html_content)
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
 
         return Response(user_data, status=status.HTTP_201_CREATED)
 
@@ -110,22 +131,26 @@ class ProRegisterView(generics.GenericAPIView):
         user.is_pro = True
         user.company_name = request.data['company_name']
         user.for_gender = request.data['for_gender']
+        user.zip_address = request.data['zip_address']
+        user.about_me = request.data['about_me']
+        user.service_type = request.data['service_type']
         user.reserved_capacity = request.data['reserved_capacity']
         user.save()
+        FRONTEND_URL = "http://localhost:3000"
 
         token = RefreshToken.for_user(user).access_token
+        verify_link = FRONTEND_URL + '/email-verify/' + str(token)
+        subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
         current_site = get_current_site(request).domain
-        relativeLink = reverse('email-verify')
-        absurl = 'http://'+current_site+relativeLink+"?token="+str(token)
-        email_body = 'Hi '+user.username + \
-            ' Use the link below to verify your email \n' + absurl
-        data = {'email_body': email_body, 'to_email': user.email,
-                'email_subject': 'Verify your email'}
+        html_content = render_to_string('verify_email.html', {
+                                        'verify_link': verify_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': user})
+        text_content = strip_tags(html_content)
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
 
-        Util.send_email(data)
-        # print(f"user in db {user.company_name}")
-
-        return Response(user_data, status=status.HTTP_201_CREATED)
+        # Util.send_email(data)
+        return Response(self.serializer_class(User.objects.get(email=user_data['email'])).data, status=status.HTTP_201_CREATED)
 
 
 class VerifyEmail(views.APIView):
@@ -135,8 +160,9 @@ class VerifyEmail(views.APIView):
         'token', in_=openapi.IN_QUERY, description='Description', type=openapi.TYPE_STRING)
 
     @swagger_auto_schema(manual_parameters=[token_param_config])
-    def get(self, request):
-        token = request.GET.get('token')
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        token = request.data['token']
         try:
             payload = jwt.decode(token, options={"verify_signature": False})
             user = User.objects.get(id=payload['user_id'])
@@ -171,6 +197,22 @@ class LogoutAPIView(generics.GenericAPIView):
         serializer.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+# method_2
+
+
+class LogoutView(views.APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class RequestPasswordResetEmail(generics.GenericAPIView):

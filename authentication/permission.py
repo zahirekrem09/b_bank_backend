@@ -8,4 +8,4 @@ class IsCurrentUser(permissions.BasePermission):
 
 class IsConnectorUser(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        return obj.is_connector == True
+        return request.user.is_connector == True

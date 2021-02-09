@@ -25,8 +25,6 @@ class Ticket(models.Model):
 
     # def __str__(self):
     #     return self.email
-
-
 class Feedback(models.Model):
     owner = models.ForeignKey(
         User, related_name='feedbacks', on_delete=models.CASCADE)
@@ -39,4 +37,4 @@ class Feedback(models.Model):
 
 class FeedBackImage(models.Model):
     image = models.ImageField(upload_to='feedbacks_images')
-    feedback = models.ForeignKey(Feedback, on_delete=models.CASCADE)
+    feedback = models.ForeignKey(Feedback, on_delete=models.CASCADE, null=True)

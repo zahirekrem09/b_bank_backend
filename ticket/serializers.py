@@ -4,6 +4,9 @@ from .models import FeedBackImage, Feedback, Ticket
 from authentication.serializers import UserTicketOwnerSerializer
 from authentication.models import User
 from authentication.utils import Util
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 
 # class Pro(serializers.PrimaryKeyRelatedField):
@@ -50,6 +53,8 @@ class TicketConnectorDetailSerializer(serializers.ModelSerializer):
         request = self.context["request"]
         instance.connector = request.user.id
         instance.pro = request.data.get("pro")
+        instance.appointment_date = request.data.get("appointment_date")
+        instance.save()
         pro = User.objects.get(id=instance.pro)
         owner = User.objects.get(id=instance.owner.id)
         email_body = 'Hi '+pro.username + \
@@ -57,11 +62,14 @@ class TicketConnectorDetailSerializer(serializers.ModelSerializer):
         data = {'email_body': email_body, 'to_email': pro.email,
                 'email_subject': 'Ticket İnformations'}
 
-        Util.send_email(data)
-
-        instance.appointment_date = request.data.get("appointment_date")
-        instance.save()
-        # print(request.data)
+        subject, from_email = 'Ticket Detail ', 'bbankdummymail@gmail.com'
+        html_content = render_to_string('ticket_detail.html', {'owner': owner, 'pro': pro, "appointment_date": request.data.get("appointment_date")
+                                                              })
+        text_content = strip_tags(html_content)
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [
+                                     pro.email, owner.email])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
         return instance
 
 
@@ -83,4 +91,4 @@ class FeedbackSerializers(serializers.ModelSerializer):
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = FeedBackImage
-        fields = ('image',)
+        fields = ('image', "feedback")

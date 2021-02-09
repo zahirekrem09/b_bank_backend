@@ -30,7 +30,7 @@ class CreateTicketsView(APIView):
 
 class TicketListView(generics.ListAPIView):
     serializer_class = TicketSerializer
-    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly,)
     queryset = Ticket.objects.all()
     lookup_field = 'id'
 
@@ -41,7 +41,7 @@ class TicketListView(generics.ListAPIView):
 
 class ClientTicketsDetailView(generics.UpdateAPIView):
     serializer_class = TicketClientDetailSerializer
-    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly,)
     queryset = Ticket.objects.all()
     lookup_field = 'id'
 
@@ -52,14 +52,14 @@ class ClientTicketsDetailView(generics.UpdateAPIView):
 
 class ConnectorTicketsDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = TicketConnectorDetailSerializer
-    # permission_classes = (permissions.IsAuthenticated, IsConnectorUser)
+    permission_classes = (permissions.IsAuthenticated, IsConnectorUser,)
     queryset = Ticket.objects.all()
     lookup_field = 'id'
 
 
 class FeedBackCreateView(APIView):
     # serializer_class = FeedbackSerializers
-    # # permission_classes = (permissions.IsAuthenticated)
+    permission_classes = (permissions.IsAuthenticated,)
     # queryset = Feedback.objects.all()
     # lookup_field = 'id'
     serializer_class = FeedbackCreateSerializers
@@ -77,7 +77,7 @@ class FeedBackCreateView(APIView):
 
 class FeedBackListView(generics.ListAPIView):
     serializer_class = FeedbackSerializers
-    # permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly,)
     queryset = Feedback.objects.all()
     lookup_field = 'id'
 
@@ -97,18 +97,18 @@ class ImageView(APIView):
     def post(self, request, id, *args, **kwargs):
         # feedback = request.data['feedback']
         feedback = get_object_or_404(Feedback, id=id)
-        # print(feedback)
 
         # converts querydict to original dict
         images = dict((request.data).lists())['image']
         flag = 1
         arr = []
+
         for img_name in images:
             modified_data = modify_input_for_multiple_files(feedback.id,
                                                             img_name)
+
             file_serializer = ImageSerializer(data=modified_data)
-            # print(file_serializer)
-            if file_serializer.is_valid():
+            if file_serializer.is_valid(raise_exception=True):
                 file_serializer.save()
                 arr.append(file_serializer.data)
             else:
