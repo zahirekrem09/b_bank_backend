@@ -5,6 +5,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
 
 
+def user_directory_path(instance, filename):
+    return 'profil_images/{0}/{1}'.format(instance.id, filename)
 class UserManager(BaseUserManager):
 
     def create_user(self, username,  email, first_name, last_name, gdpr_consent,phone_number, password=None, **extra):
@@ -145,7 +147,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     preferred_lang = models.IntegerField(
         choices=PREFERREND_LANG_CHOICES, default=PREFERREND_LANG_NOT_SPECIFIED)
     expectation = models.CharField(max_length=200, blank=True, null=True)
-    profile_image = models.ImageField(null=True, blank=True)
+    profile_image = models.ImageField(
+        null=True, blank=True, upload_to=user_directory_path, default='default-avatar-icon.png')
     is_active = models.BooleanField(default=True)
     is_verified = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)

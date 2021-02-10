@@ -269,7 +269,7 @@ class UserDetail(generics.RetrieveUpdateAPIView):
     serializer_class = UserDetailSerializer
     permission_classes = (permissions.IsAuthenticated, IsCurrentUser)
     lookup_field = 'username'
-    # TODO: Custom permission
+
 
     def get_queryset(self):
         queryset = User.objects.all()
