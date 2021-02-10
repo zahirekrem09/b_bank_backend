@@ -97,6 +97,7 @@ class ImageView(APIView):
     def post(self, request, id, *args, **kwargs):
         # feedback = request.data['feedback']
         feedback = get_object_or_404(Feedback, id=id)
+        print(feedback)
 
         # converts querydict to original dict
         images = dict((request.data).lists())['image']

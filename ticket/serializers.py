@@ -25,8 +25,33 @@ def pro_user_feild():
     return pro_user
 
 
+class TicketClientDetailSerializer(serializers.ModelSerializer):
+    owner = UserTicketOwnerSerializer(read_only=True)
+
+    class Meta:
+        model = Ticket
+        fields = ("id", "owner", "appointment_date")
+
+
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FeedBackImage
+        fields = ('image', "feedback")
+
+
+class FeedbackSerializers(serializers.ModelSerializer):
+    owner = UserTicketOwnerSerializer(read_only=True)
+    # ticket = TicketClientDetailSerializer(read_only=True)
+    feedback_images = ImageSerializer(many=True)
+
+    class Meta:
+        model = Feedback
+        fields = "__all__"
+
+
 class TicketSerializer(serializers.ModelSerializer):
     owner = UserTicketOwnerSerializer(read_only=True)
+    feedbacks = FeedbackSerializers(many=True)
 
     class Meta:
         model = Ticket
@@ -64,7 +89,7 @@ class TicketConnectorDetailSerializer(serializers.ModelSerializer):
 
         subject, from_email = 'Ticket Detail ', 'bbankdummymail@gmail.com'
         html_content = render_to_string('ticket_detail.html', {'owner': owner, 'pro': pro, "appointment_date": request.data.get("appointment_date")
-                                                              })
+                                                               })
         text_content = strip_tags(html_content)
         msg = EmailMultiAlternatives(subject, text_content, from_email, [
                                      pro.email, owner.email])
@@ -77,18 +102,3 @@ class FeedbackCreateSerializers(serializers.ModelSerializer):
     class Meta:
         model = Feedback
         fields = ("content",)
-
-
-class FeedbackSerializers(serializers.ModelSerializer):
-    owner = UserTicketOwnerSerializer(read_only=True)
-    ticket = TicketClientDetailSerializer(read_only=True)
-
-    class Meta:
-        model = Feedback
-        fields = "__all__"
-
-
-class ImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FeedBackImage
-        fields = ('image', "feedback")

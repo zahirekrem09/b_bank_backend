@@ -37,4 +37,5 @@ class Feedback(models.Model):
 
 class FeedBackImage(models.Model):
     image = models.ImageField(upload_to='feedbacks_images')
-    feedback = models.ForeignKey(Feedback, on_delete=models.CASCADE, null=True)
+    feedback = models.ForeignKey(
+        Feedback, on_delete=models.CASCADE, null=True, related_name='feedback_images')
