@@ -25,12 +25,22 @@ def pro_user_feild():
     return pro_user
 
 
-class TicketClientDetailSerializer(serializers.ModelSerializer):
-    owner = UserTicketOwnerSerializer(read_only=True)
+class TicketClientCreateSerializer(serializers.ModelSerializer):
+    service_type = serializers.ChoiceField(choices=Ticket.SERVICE_TYPE_CHOICES)
 
     class Meta:
         model = Ticket
-        fields = ("id", "owner", "appointment_date")
+        fields = ("id","service_type")
+
+
+
+class TicketClientDetailSerializer(serializers.ModelSerializer):
+    owner = UserTicketOwnerSerializer(read_only=True)
+    service_type = serializers.ChoiceField(choices=Ticket.SERVICE_TYPE_CHOICES)
+    appointment_date = serializers.DateTimeField(read_only = True)
+    class Meta:
+        model = Ticket
+        fields = ("id", "owner", "appointment_date","service_type")
 
 
 class ImageSerializer(serializers.ModelSerializer):
@@ -56,14 +66,6 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = "__all__"
-
-
-class TicketClientDetailSerializer(serializers.ModelSerializer):
-    owner = UserTicketOwnerSerializer(read_only=True)
-
-    class Meta:
-        model = Ticket
-        fields = ("id", "owner", "appointment_date")
 
 
 class TicketConnectorDetailSerializer(serializers.ModelSerializer):

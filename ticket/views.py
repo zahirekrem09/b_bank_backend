@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .serializers import (
-    TicketSerializer, TicketClientDetailSerializer, TicketConnectorDetailSerializer, ImageSerializer, FeedbackCreateSerializers, FeedbackSerializers)
+    TicketSerializer, TicketClientDetailSerializer, TicketConnectorDetailSerializer, ImageSerializer, FeedbackCreateSerializers, FeedbackSerializers,TicketClientCreateSerializer)
 from .models import FeedBackImage, Feedback, Ticket
 from .helpers import modify_input_for_multiple_files
 from django.shortcuts import render
@@ -15,11 +15,13 @@ from rest_framework.parsers import MultiPartParser, FormParser
 
 class CreateTicketsView(APIView):
     permission_classes = (permissions.IsAuthenticated, )
+    serializer_class = TicketClientCreateSerializer
 
     def post(self, request, **extra):
+        serializer = self.serializer_class(data=request.data)
         owner = User.objects.get(username=request.user.username)
         Ticket.objects.create(owner=owner, email=owner.email,
-                              first_name=owner.first_name, last_name=owner.last_name, phone_number=owner.phone_number, about_me=owner.about_me, ** extra)
+                              first_name=owner.first_name, last_name=owner.last_name, phone_number=owner.phone_number, about_me=owner.about_me, service_type =request.data['service_type'], ** extra)
 
         data = {
             "messages": "Create Ticket Successfuly"

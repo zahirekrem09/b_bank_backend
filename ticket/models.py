@@ -5,7 +5,25 @@ from authentication.models import User
 # def user_directory_path(instance, filename):
 #     return 'ticket/{0}/{1}'.format(instance.owner.id, filename)
 class Ticket(models.Model):
-   # TODO: tickete göre değişicek
+    SERVICE_TYPE_KAPPER = 0
+    SERVICE_TYPE_SCHOONHEIDSSPECIALISTE = 1
+    SERVICE_TYPE_PEDICURE = 2
+    SERVICE_TYPE_VISAGIST = 3
+    SERVICE_TYPE_STYLISTE = 4
+    SERVICE_TYPE_NAGELSTYLISTE = 5
+    SERVICE_TYPE_HAARWERKEN = 6
+    SERVICE_TYPE_NOT_SPECIFIED = 7
+    SERVICE_TYPE_CHOICES = (
+        (SERVICE_TYPE_KAPPER, 'kapper'),
+        (SERVICE_TYPE_SCHOONHEIDSSPECIALISTE, 'schoonheidsspecialiste'),
+        (SERVICE_TYPE_PEDICURE, 'pedicure'),
+        (SERVICE_TYPE_VISAGIST, 'visagist'),
+        (SERVICE_TYPE_STYLISTE, 'styliste'),
+        (SERVICE_TYPE_NAGELSTYLISTE, 'nagelstyliste'),
+        (SERVICE_TYPE_HAARWERKEN, 'haarwerken'),
+        (SERVICE_TYPE_NOT_SPECIFIED, 'not specified'),
+
+    )
     owner = models.ForeignKey(
         User, related_name='owner', on_delete=models.CASCADE)
     email = models.EmailField(max_length=250)
@@ -20,6 +38,8 @@ class Ticket(models.Model):
     ticket_received = models.BooleanField(default=False)
     connector = models.PositiveIntegerField(blank=True, null=True)
     pro = models.PositiveIntegerField(blank=True, null=True)
+    service_type = models.IntegerField(choices=SERVICE_TYPE_CHOICES,
+                                       default=SERVICE_TYPE_NOT_SPECIFIED)
     distance = models.IntegerField(default=0)
     terms_approved = models.BooleanField(default=False)
 
