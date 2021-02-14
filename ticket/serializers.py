@@ -30,17 +30,17 @@ class TicketClientCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ticket
-        fields = ("id","service_type")
-
+        fields = ("id", "service_type")
 
 
 class TicketClientDetailSerializer(serializers.ModelSerializer):
     owner = UserTicketOwnerSerializer(read_only=True)
     service_type = serializers.ChoiceField(choices=Ticket.SERVICE_TYPE_CHOICES)
-    appointment_date = serializers.DateTimeField(read_only = True)
+    appointment_date = serializers.DateTimeField(read_only=True)
+
     class Meta:
         model = Ticket
-        fields = ("id", "owner", "appointment_date","service_type")
+        fields = ("id", "owner", "appointment_date", "service_type")
 
 
 class ImageSerializer(serializers.ModelSerializer):
@@ -62,19 +62,28 @@ class FeedbackSerializers(serializers.ModelSerializer):
 class TicketSerializer(serializers.ModelSerializer):
     owner = UserTicketOwnerSerializer(read_only=True)
     feedbacks = FeedbackSerializers(many=True)
+    service_type = serializers.SerializerMethodField()
 
     class Meta:
         model = Ticket
         fields = "__all__"
 
+    def get_service_type(self, obj):
+        return obj.get_service_type_display()
+
 
 class TicketConnectorDetailSerializer(serializers.ModelSerializer):
     pro = serializers.ChoiceField(choices=pro_user_feild())
     connector = serializers.IntegerField(read_only=True)
+    service_type = serializers.SerializerMethodField()
 
     class Meta:
         model = Ticket
-        fields = ("id", "owner", "pro", "connector", "appointment_date")
+        fields = ("id", "owner", "pro", "connector",
+                  "appointment_date", 'service_type')
+
+    def get_service_type(self, obj):
+        return obj.get_service_type_display()
 
     def update(self, instance, validated_data):
         request = self.context["request"]
@@ -97,6 +106,7 @@ class TicketConnectorDetailSerializer(serializers.ModelSerializer):
                                      pro.email, owner.email])
         msg.attach_alternative(html_content, "text/html")
         msg.send()
+
         return instance
 
 

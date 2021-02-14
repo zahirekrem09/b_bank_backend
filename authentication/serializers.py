@@ -9,6 +9,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
+
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     @classmethod
@@ -19,6 +20,8 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['username'] = user.username
         token['email'] = user.email
         return token
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         max_length=30, min_length=6, write_only=True)
@@ -192,7 +195,8 @@ class SetNewPasswordSerializer(serializers.Serializer):
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        exclude = ("password", )
+        # fields = '__all__'
         lookup_field = "username"
 
 

@@ -168,6 +168,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+    
+    class Meta:
+        ordering = ("created_at",)
 
     def tokens(self):
         refresh = RefreshToken.for_user(self)

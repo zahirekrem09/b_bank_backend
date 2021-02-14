@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .serializers import (
-    TicketSerializer, TicketClientDetailSerializer, TicketConnectorDetailSerializer, ImageSerializer, FeedbackCreateSerializers, FeedbackSerializers,TicketClientCreateSerializer)
+    TicketSerializer, TicketClientDetailSerializer, TicketConnectorDetailSerializer, ImageSerializer, FeedbackCreateSerializers, FeedbackSerializers, TicketClientCreateSerializer)
 from .models import FeedBackImage, Feedback, Ticket
 from .helpers import modify_input_for_multiple_files
 from django.shortcuts import render
@@ -11,6 +11,7 @@ from authentication.permission import IsConnectorUser
 from rest_framework import generics, status, views, permissions
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.db.models import Q, Count, Subquery, OuterRef
 
 
 class CreateTicketsView(APIView):
@@ -21,7 +22,7 @@ class CreateTicketsView(APIView):
         serializer = self.serializer_class(data=request.data)
         owner = User.objects.get(username=request.user.username)
         Ticket.objects.create(owner=owner, email=owner.email,
-                              first_name=owner.first_name, last_name=owner.last_name, phone_number=owner.phone_number, about_me=owner.about_me, service_type =request.data['service_type'], ** extra)
+                              first_name=owner.first_name, last_name=owner.last_name, phone_number=owner.phone_number, about_me=owner.about_me, service_type=request.data['service_type'], ** extra)
 
         data = {
             "messages": "Create Ticket Successfuly"
@@ -32,13 +33,27 @@ class CreateTicketsView(APIView):
 
 class TicketListView(generics.ListAPIView):
     serializer_class = TicketSerializer
-    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly,)
+    permission_classes = (permissions.IsAuthenticated, IsConnectorUser,)
     queryset = Ticket.objects.all()
     lookup_field = 'id'
 
     def get_queryset(self):
-        queryset = Ticket.objects.filter(owner=self.request.user)
-        return queryset
+        queryset = Ticket.objects.all()
+        if self.request.method.lower() != "get":
+            return queryset
+        keyword = self.request.GET.get('keyword')
+        if keyword:
+            queryset = queryset.filter(
+                Q(owner__username__icontains=keyword) |
+                Q(email__icontains=keyword) |
+                Q(first_name__icontains=keyword) |
+                Q(last_name__icontains=keyword)
+
+            ).distinct()
+
+            return queryset
+        else:
+            return queryset
 
 
 class ClientTicketsDetailView(generics.UpdateAPIView):

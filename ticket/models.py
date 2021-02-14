@@ -45,6 +45,11 @@ class Ticket(models.Model):
 
     # def __str__(self):
     #     return self.email
+    
+    class Meta:
+        ordering = ("created_at",)
+
+
 class Feedback(models.Model):
     owner = models.ForeignKey(
         User, related_name='feedbacks', on_delete=models.CASCADE)
@@ -53,6 +58,9 @@ class Feedback(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     content = models.TextField(max_length=1500)
+    
+    class Meta:
+        ordering = ("created_at",)
 
 
 class FeedBackImage(models.Model):

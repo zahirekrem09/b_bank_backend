@@ -20,6 +20,9 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives
 from rest_framework_simplejwt.views import TokenObtainPairView
+from .permission import IsConnectorUser
+import re
+from django.db.models import Q, Count, Subquery, OuterRef
 
 
 class MyObtainTokenPairView(TokenObtainPairView):
@@ -75,7 +78,7 @@ class ConnectorRegisterView(generics.GenericAPIView):
         user_data = serializer.data
         user = User.objects.get(email=user_data['email'])
         user.is_connector = True
-        user.save()    
+        user.save()
         FRONTEND_URL = "http://localhost:3000"
 
         token = RefreshToken.for_user(user).access_token
@@ -270,9 +273,32 @@ class UserDetail(generics.RetrieveUpdateAPIView):
     permission_classes = (permissions.IsAuthenticated, IsCurrentUser)
     lookup_field = 'username'
 
-
     def get_queryset(self):
         queryset = User.objects.all()
         username = self.kwargs["username"]
         queryset = queryset.filter(username=username)
         return queryset
+
+
+class UserListView(generics.ListAPIView):
+    serializer_class = UserDetailSerializer
+    permission_classes = (permissions.IsAuthenticated, IsConnectorUser,)
+    queryset = User.objects.all()
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        if self.request.method.lower() != "get":
+            return queryset
+        keyword = self.request.GET.get('keyword')
+        if keyword:
+            queryset = queryset.filter(
+                Q(username__icontains=keyword) |
+                Q(email__icontains=keyword) |
+                Q(first_name__icontains=keyword) |
+                Q(last_name__icontains=keyword)
+            ).distinct()
+
+            return queryset
+        else:
+            return queryset
