@@ -52,7 +52,7 @@ class RegisterView(generics.GenericAPIView):
 
         # Util.send_email(data)
         # print(f"user in db {user}")
-        FRONTEND_URL = "http://localhost:3000"
+        FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
 
         token = RefreshToken.for_user(user).access_token
         verify_link = FRONTEND_URL + '/email-verify/' + str(token)
@@ -79,7 +79,7 @@ class ConnectorRegisterView(generics.GenericAPIView):
         user = User.objects.get(email=user_data['email'])
         user.is_connector = True
         user.save()
-        FRONTEND_URL = "http://localhost:3000"
+        FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
 
         token = RefreshToken.for_user(user).access_token
         verify_link = FRONTEND_URL + '/email-verify/' + str(token)
@@ -106,7 +106,7 @@ class SponsorRegisterView(generics.GenericAPIView):
         user = User.objects.get(email=user_data['email'])
         user.is_sponsor = True
         user.save()
-        FRONTEND_URL = "http://localhost:3000"
+        FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
 
         token = RefreshToken.for_user(user).access_token
         verify_link = FRONTEND_URL + '/email-verify/' + str(token)
@@ -139,7 +139,7 @@ class ProRegisterView(generics.GenericAPIView):
         user.service_type = request.data['service_type']
         user.reserved_capacity = request.data['reserved_capacity']
         user.save()
-        FRONTEND_URL = "http://localhost:3000"
+        FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
 
         token = RefreshToken.for_user(user).access_token
         verify_link = FRONTEND_URL + '/email-verify/' + str(token)

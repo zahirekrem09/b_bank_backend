@@ -8,7 +8,7 @@ from .permission import IsOwnerOrReadOnly
 from rest_framework.views import APIView
 from authentication.models import User
 from authentication.permission import IsConnectorUser
-from rest_framework import generics, status, views, permissions
+from rest_framework import generics, status, views, permissions, filters
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Q, Count, Subquery, OuterRef
@@ -35,25 +35,27 @@ class TicketListView(generics.ListAPIView):
     serializer_class = TicketSerializer
     permission_classes = (permissions.IsAuthenticated, IsConnectorUser,)
     queryset = Ticket.objects.all()
+    filter_backends = (filters.SearchFilter, filters.OrderingFilter,)
+    search_fields = ("owner__username", 'email', 'first_name', 'last_name',)
     lookup_field = 'id'
 
-    def get_queryset(self):
-        queryset = Ticket.objects.all()
-        if self.request.method.lower() != "get":
-            return queryset
-        keyword = self.request.GET.get('keyword')
-        if keyword:
-            queryset = queryset.filter(
-                Q(owner__username__icontains=keyword) |
-                Q(email__icontains=keyword) |
-                Q(first_name__icontains=keyword) |
-                Q(last_name__icontains=keyword)
+    # def get_queryset(self):
+    #     queryset = Ticket.objects.all()
+    #     if self.request.method.lower() != "get":
+    #         return queryset
+    #     keyword = self.request.GET.get('keyword')
+    #     if keyword:
+    #         queryset = queryset.filter(
+    #             Q(owner__username__icontains=keyword) |
+    #             Q(email__icontains=keyword) |
+    #             Q(first_name__icontains=keyword) |
+    #             Q(last_name__icontains=keyword)
 
-            ).distinct()
+    #         ).distinct()
 
-            return queryset
-        else:
-            return queryset
+    #         return queryset
+    #     else:
+    #         return queryset
 
 
 class ClientTicketsDetailView(generics.UpdateAPIView):
