@@ -55,7 +55,7 @@ class RegisterView(generics.GenericAPIView):
         FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
 
         token = RefreshToken.for_user(user).access_token
-        verify_link = FRONTEND_URL + '/email-verify/' + str(token)
+        verify_link = FRONTEND_URL + 'email-verify/' + str(token)
         subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
         current_site = get_current_site(request).domain
         html_content = render_to_string('verify_email.html', {
@@ -82,7 +82,7 @@ class ConnectorRegisterView(generics.GenericAPIView):
         FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
 
         token = RefreshToken.for_user(user).access_token
-        verify_link = FRONTEND_URL + '/email-verify/' + str(token)
+        verify_link = FRONTEND_URL + 'email-verify/' + str(token)
         subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
         current_site = get_current_site(request).domain
         html_content = render_to_string('verify_email.html', {
@@ -109,7 +109,7 @@ class SponsorRegisterView(generics.GenericAPIView):
         FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
 
         token = RefreshToken.for_user(user).access_token
-        verify_link = FRONTEND_URL + '/email-verify/' + str(token)
+        verify_link = FRONTEND_URL + 'email-verify/' + str(token)
         subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
         current_site = get_current_site(request).domain
         html_content = render_to_string('verify_email.html', {
@@ -142,7 +142,7 @@ class ProRegisterView(generics.GenericAPIView):
         FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
 
         token = RefreshToken.for_user(user).access_token
-        verify_link = FRONTEND_URL + '/email-verify/' + str(token)
+        verify_link = FRONTEND_URL + 'email-verify/' + str(token)
         subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
         current_site = get_current_site(request).domain
         html_content = render_to_string('verify_email.html', {
