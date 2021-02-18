@@ -13,6 +13,14 @@ class Ticket(models.Model):
     SERVICE_TYPE_NAGELSTYLISTE = 5
     SERVICE_TYPE_HAARWERKEN = 6
     SERVICE_TYPE_NOT_SPECIFIED = 7
+    AREA_ZERO = 0
+    AREA_ONE = 1
+    AREA_NOT_SPECIFIED = 2
+    AREA_CHOICES = (
+        (AREA_ZERO, "Amsterdam"),
+        (AREA_ONE, "Rodertam"),
+        (AREA_NOT_SPECIFIED, "not specified"),
+    )
     SERVICE_TYPE_CHOICES = (
         (SERVICE_TYPE_KAPPER, 'kapper'),
         (SERVICE_TYPE_SCHOONHEIDSSPECIALISTE, 'schoonheidsspecialiste'),
@@ -33,6 +41,8 @@ class Ticket(models.Model):
     phone_number2 = models.CharField(max_length=20, blank=True, null=True)
     about_me = models.TextField(max_length=1500)
     created_at = models.DateTimeField(auto_now_add=True)
+    area = models.IntegerField(choices=AREA_CHOICES,
+                               default=AREA_NOT_SPECIFIED)
     updated_at = models.DateTimeField(auto_now=True)
     appointment_date = models.DateTimeField(null=True, blank=True)
     ticket_received = models.BooleanField(default=False)
@@ -42,10 +52,12 @@ class Ticket(models.Model):
                                        default=SERVICE_TYPE_NOT_SPECIFIED)
     distance = models.IntegerField(default=0)
     terms_approved = models.BooleanField(default=False)
+    is_pro_confirm = models.BooleanField(default=False)
+    is_client_confirm = models.BooleanField(default=False)
 
     # def __str__(self):
     #     return self.email
-    
+
     class Meta:
         ordering = ("created_at",)
 
@@ -58,7 +70,7 @@ class Feedback(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     content = models.TextField(max_length=1500)
-    
+
     class Meta:
         ordering = ("created_at",)
 

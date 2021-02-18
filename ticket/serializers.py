@@ -91,6 +91,8 @@ class TicketConnectorDetailSerializer(serializers.ModelSerializer):
         instance.pro = request.data.get("pro")
         instance.appointment_date = request.data.get("appointment_date")
         instance.save()
+        FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
+        confirm_link = FRONTEND_URL + 'ticket/confirm/' + str(instance.id)
         pro = User.objects.get(id=instance.pro)
         owner = User.objects.get(id=instance.owner.id)
         email_body = 'Hi '+pro.username + \
@@ -99,7 +101,7 @@ class TicketConnectorDetailSerializer(serializers.ModelSerializer):
                 'email_subject': 'Ticket İnformations'}
 
         subject, from_email = 'Ticket Detail ', 'bbankdummymail@gmail.com'
-        html_content = render_to_string('ticket_detail.html', {'owner': owner, 'pro': pro, "appointment_date": request.data.get("appointment_date")
+        html_content = render_to_string('ticket_detail.html', {'owner': owner, 'pro': pro, "appointment_date": request.data.get("appointment_date"), "confirm_link": confirm_link
                                                                })
         text_content = strip_tags(html_content)
         msg = EmailMultiAlternatives(subject, text_content, from_email, [

@@ -31,6 +31,30 @@ class CreateTicketsView(APIView):
         return Response(data, status=status.HTTP_201_CREATED)
 
 
+class ConfirmTicketsView(APIView):
+    serializer_class = TicketClientDetailSerializer
+    queryset = Ticket.objects.all()
+    permission_classes = (permissions.IsAuthenticated, )
+    lookup_field = 'id'
+
+    def post(self, request, *args, **kwargs):
+        current_user = User.objects.get(username=request.user.username)
+        ticket_id = self.kwargs["id"]
+        ticket = Ticket.objects.get(id=ticket_id)
+        if(ticket.owner == current_user):
+            ticket.is_client_confirm = True
+            ticket.save()
+        elif (current_user == ticket.pro):
+            ticket.is_pro_confirm = True
+            ticket.save()
+        else:
+            return Response({"error": "Not confirm ticket "}, status=400)
+        data = {
+            "messages": "Confirm  Ticket Successfuly"}
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
 class TicketListView(generics.ListAPIView):
     serializer_class = TicketSerializer
     permission_classes = (permissions.IsAuthenticated, IsConnectorUser,)
