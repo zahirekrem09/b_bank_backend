@@ -36,7 +36,7 @@ class TicketClientCreateSerializer(serializers.ModelSerializer):
 class TicketClientDetailSerializer(serializers.ModelSerializer):
     owner = UserTicketOwnerSerializer(read_only=True)
     service_type = serializers.ChoiceField(choices=Ticket.SERVICE_TYPE_CHOICES)
-    appointment_date = serializers.DateTimeField(read_only=True)
+    appointment_date = serializers.DateTimeField()
 
     class Meta:
         model = Ticket

@@ -82,7 +82,7 @@ class TicketListView(generics.ListAPIView):
     #         return queryset
 
 
-class ClientTicketsDetailView(generics.UpdateAPIView):
+class ClientTicketsDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = TicketClientDetailSerializer
     permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly,)
     queryset = Ticket.objects.all()
