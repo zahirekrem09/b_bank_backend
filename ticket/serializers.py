@@ -17,7 +17,7 @@ from django.utils.html import strip_tags
 def pro_user_feild():
 
     if User.objects.filter(is_pro=True).exists():
-        pro_user = [(u.id, u.username)
+        pro_user = [(u.id, u.company_name)
                     for u in User.objects.filter(is_pro=True)]
     else:
         pro_user = []
@@ -75,12 +75,15 @@ class TicketSerializer(serializers.ModelSerializer):
 class TicketConnectorDetailSerializer(serializers.ModelSerializer):
     pro = serializers.ChoiceField(choices=pro_user_feild())
     connector = serializers.IntegerField(read_only=True)
-    service_type = serializers.SerializerMethodField()
+    # service_type = serializers.SerializerMethodField()
+    service_type = serializers.ChoiceField(choices=Ticket.SERVICE_TYPE_CHOICES)
 
     class Meta:
         model = Ticket
         fields = ("id", "owner", "pro", "connector",
                   "appointment_date", 'service_type')
+
+        read_only_fields = ('appointment_date', 'owner', 'connector')
 
     def get_service_type(self, obj):
         return obj.get_service_type_display()
@@ -95,10 +98,10 @@ class TicketConnectorDetailSerializer(serializers.ModelSerializer):
         confirm_link = FRONTEND_URL + 'ticket/confirm/' + str(instance.id)
         pro = User.objects.get(id=instance.pro)
         owner = User.objects.get(id=instance.owner.id)
-        email_body = 'Hi '+pro.username + \
-            ' Ticket İnformations \n' + pro.company_name
-        data = {'email_body': email_body, 'to_email': pro.email,
-                'email_subject': 'Ticket İnformations'}
+        # email_body = 'Hi '+pro.username + \
+        #     ' Ticket İnformations \n' + pro.company_name
+        # data = {'email_body': email_body, 'to_email': pro.email,
+        #         'email_subject': 'Ticket İnformations'}
 
         subject, from_email = 'Ticket Detail ', 'bbankdummymail@gmail.com'
         html_content = render_to_string('ticket_detail.html', {'owner': owner, 'pro': pro, "appointment_date": request.data.get("appointment_date"), "confirm_link": confirm_link
