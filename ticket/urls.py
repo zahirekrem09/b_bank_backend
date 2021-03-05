@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (CreateTicketsView, ClientTicketsDetailView,
-                    ConnectorTicketsDetailView, TicketListView, ImageView, FeedBackCreateView, FeedBackListView, ConfirmTicketsView, ClientTicketsListView)
+                    ConnectorTicketsDetailView, TicketListView, ImageView, FeedBackCreateView, FeedBackListView, ConfirmTicketsView, ClientTicketsListView, TicketTermsApprovedView)
 
 urlpatterns = [
     path('create/', CreateTicketsView.as_view(), name='ticket-create'),
@@ -19,4 +19,6 @@ urlpatterns = [
          name="feedback-list"),
     path('confirm/<int:id>', ConfirmTicketsView.as_view(),
          name='ticket-confirm'),
+    path('terms_approved/', TicketTermsApprovedView.as_view(),
+         name='tickets-terms_approved'),
 ]

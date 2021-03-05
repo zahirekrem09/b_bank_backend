@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .serializers import (
-    TicketSerializer, TicketClientDetailSerializer, TicketConnectorDetailSerializer, ImageSerializer, FeedbackCreateSerializers, FeedbackSerializers, TicketClientCreateSerializer)
+    TicketSerializer, TicketClientDetailSerializer, TicketConnectorDetailSerializer, ImageSerializer, FeedbackCreateSerializers, FeedbackSerializers, TicketClientCreateSerializer, TicketTermsApprovedSerializer)
 from .models import FeedBackImage, Feedback, Ticket
 from .helpers import modify_input_for_multiple_files
 from django.shortcuts import render
@@ -12,6 +12,12 @@ from rest_framework import generics, status, views, permissions, filters
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Q, Count, Subquery, OuterRef
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.core.mail import EmailMultiAlternatives
+from django.contrib.sites.shortcuts import get_current_site
+from rest_framework_simplejwt.tokens import RefreshToken
+import jwt
 
 
 class CreateTicketsView(APIView):
@@ -21,14 +27,46 @@ class CreateTicketsView(APIView):
     def post(self, request, **extra):
         serializer = self.serializer_class(data=request.data)
         owner = User.objects.get(username=request.user.username)
-        Ticket.objects.create(owner=owner, email=owner.email,
-                              first_name=owner.first_name, last_name=owner.last_name, phone_number=owner.phone_number, about_me=owner.about_me, service_type=request.data['service_type'], ** extra)
+        ticket = Ticket.objects.create(owner=owner, email=owner.email,
+                                       first_name=owner.first_name, last_name=owner.last_name, phone_number=owner.phone_number, about_me=owner.about_me, service_type=request.data['service_type'], ** extra)
+
+        FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
+
+        terms_approved_link = FRONTEND_URL + 'terms_approved/' + str(ticket.id)
+        subject, from_email, to = 'Terms Approved', 'bbankdummymail@gmail.com', owner.email
+        current_site = get_current_site(request).domain
+        html_content = render_to_string('terms_approved_link.html', {
+                                        'terms_approved_link': terms_approved_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': owner})
+        text_content = strip_tags(html_content)
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
 
         data = {
             "messages": "Create Ticket Successfuly"
         }
 
-        return Response(data, status=status.HTTP_201_CREATED)
+        return Response(self.serializer_class(ticket).data, status=status.HTTP_201_CREATED)
+
+
+class TicketTermsApprovedView(APIView):
+    serializer_class = TicketTermsApprovedSerializer
+    queryset = Ticket.objects.all()
+    permission_classes = (permissions.IsAuthenticated, )
+    lookup_field = 'id'
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        ticket_id = request.data['id']
+        current_user = User.objects.get(username=request.user.username)
+        ticket = Ticket.objects.get(id=ticket_id, owner=current_user)
+        ticket.terms_approved = True
+        ticket.save()
+
+        data = {
+            "messages": "Confirm  Ticket Successfuly"}
+
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class ConfirmTicketsView(APIView):

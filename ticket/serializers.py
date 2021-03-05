@@ -27,10 +27,12 @@ def pro_user_feild():
 
 class TicketClientCreateSerializer(serializers.ModelSerializer):
     service_type = serializers.ChoiceField(choices=Ticket.SERVICE_TYPE_CHOICES)
+    owner = UserTicketOwnerSerializer(read_only=True)
 
     class Meta:
         model = Ticket
-        fields = ("id", "service_type")
+        fields = ("id", "service_type", "owner", "terms_approved")
+        read_only_fields = ('owner', 'terms_approved')
 
 
 class TicketClientDetailSerializer(serializers.ModelSerializer):
@@ -70,6 +72,14 @@ class TicketSerializer(serializers.ModelSerializer):
 
     def get_service_type(self, obj):
         return obj.get_service_type_display()
+
+
+class TicketTermsApprovedSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(max_length=5544)
+
+    class Meta:
+        model = Ticket
+        fields = ['id']
 
 
 class TicketConnectorDetailSerializer(serializers.ModelSerializer):
