@@ -49,8 +49,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # my App
-    'authentication',
-    "ticket",
+    # 'authentication',
+    # "ticket",
+    'ticket.apps.TicketConfig',
+    'authentication.apps.AuthenticationConfig',
 
     # 3.Party App
     'rest_framework',
