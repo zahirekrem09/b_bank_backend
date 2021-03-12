@@ -28,23 +28,19 @@ class CreateTicketsView(APIView):
         serializer = self.serializer_class(data=request.data)
         owner = User.objects.get(username=request.user.username)
         ticket = Ticket.objects.create(owner=owner, email=owner.email,
-                                       first_name=owner.first_name, last_name=owner.last_name, phone_number=owner.phone_number, about_me=owner.about_me, service_type=request.data['service_type'], ** extra)
+                                       first_name=owner.first_name, last_name=owner.last_name, phone_number=owner.phone_number, about_me=owner.about_me, ** extra)
 
-        FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
+        # FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
 
-        terms_approved_link = FRONTEND_URL + 'terms_approved/' + str(ticket.id)
-        subject, from_email, to = 'Terms Approved', 'bbankdummymail@gmail.com', owner.email
-        current_site = get_current_site(request).domain
-        html_content = render_to_string('terms_approved_link.html', {
-                                        'terms_approved_link': terms_approved_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': owner})
-        text_content = strip_tags(html_content)
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
-
-        data = {
-            "messages": "Create Ticket Successfuly"
-        }
+        # terms_approved_link = FRONTEND_URL + 'terms_approved/' + str(ticket.id)
+        # subject, from_email, to = 'Terms Approved', 'bbankdummymail@gmail.com', owner.email
+        # current_site = get_current_site(request).domain
+        # html_content = render_to_string('terms_approved_link.html', {
+        #                                 'terms_approved_link': terms_approved_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': owner})
+        # text_content = strip_tags(html_content)
+        # msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        # msg.attach_alternative(html_content, "text/html")
+        # msg.send()
 
         return Response(self.serializer_class(ticket).data, status=status.HTTP_201_CREATED)
 
@@ -52,19 +48,19 @@ class CreateTicketsView(APIView):
 class TicketTermsApprovedView(APIView):
     serializer_class = TicketTermsApprovedSerializer
     queryset = Ticket.objects.all()
-    permission_classes = (permissions.IsAuthenticated, )
+    # permission_classes = (permissions.IsAuthenticated, )
     lookup_field = 'id'
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         ticket_id = request.data['id']
-        current_user = User.objects.get(username=request.user.username)
-        ticket = Ticket.objects.get(id=ticket_id, owner=current_user)
+        # current_user = User.objects.get(username=request.user.username)
+        ticket = Ticket.objects.get(id=ticket_id)
         ticket.terms_approved = True
         ticket.save()
 
         data = {
-            "messages": "Confirm  Ticket Successfuly"}
+            "messages": "Ticket Terms Approved Successfuly"}
 
         return Response(data, status=status.HTTP_200_OK)
 
@@ -101,23 +97,16 @@ class TicketListView(generics.ListAPIView):
     search_fields = ("owner__username", 'email', 'first_name', 'last_name',)
     lookup_field = 'id'
 
-    # def get_queryset(self):
-    #     queryset = Ticket.objects.all()
-    #     if self.request.method.lower() != "get":
-    #         return queryset
-    #     keyword = self.request.GET.get('keyword')
-    #     if keyword:
-    #         queryset = queryset.filter(
-    #             Q(owner__username__icontains=keyword) |
-    #             Q(email__icontains=keyword) |
-    #             Q(first_name__icontains=keyword) |
-    #             Q(last_name__icontains=keyword)
-
-    #         ).distinct()
-
-    #         return queryset
-    #     else:
-    #         return queryset
+    def get_queryset(self):
+        queryset = Ticket.objects.all()
+        if self.request.user.is_pro == True:
+            queryset = Ticket.objects.filter(pro=self.request.user.id)
+            return queryset
+        elif self.request.user.is_client == True:
+            queryset = Ticket.objects.filter(owner=self.request.user)
+            return queryset
+        else:
+            return queryset
 
 
 class ClientTicketsListView(generics.ListAPIView):

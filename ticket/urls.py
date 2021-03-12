@@ -19,6 +19,6 @@ urlpatterns = [
          name="feedback-list"),
     path('confirm/<int:id>', ConfirmTicketsView.as_view(),
          name='ticket-confirm'),
-    path('terms_approved/', TicketTermsApprovedView.as_view(),
+    path('terms-approved/', TicketTermsApprovedView.as_view(),
          name='tickets-terms_approved'),
 ]

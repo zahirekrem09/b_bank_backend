@@ -26,23 +26,23 @@ def pro_user_feild():
 
 
 class TicketClientCreateSerializer(serializers.ModelSerializer):
-    service_type = serializers.ChoiceField(choices=Ticket.SERVICE_TYPE_CHOICES)
+    # service_type = serializers.ChoiceField(choices=Ticket.SERVICE_TYPE_CHOICES)
     owner = UserTicketOwnerSerializer(read_only=True)
 
     class Meta:
         model = Ticket
         fields = ("id", "service_type", "owner", "terms_approved")
-        read_only_fields = ('owner', 'terms_approved')
+        read_only_fields = ('owner', 'terms_approved', 'service_type')
 
 
 class TicketClientDetailSerializer(serializers.ModelSerializer):
     owner = UserTicketOwnerSerializer(read_only=True)
-    service_type = serializers.ChoiceField(choices=Ticket.SERVICE_TYPE_CHOICES)
+    # service_type = serializers.ChoiceField(choices=Ticket.SERVICE_TYPE_CHOICES)
     appointment_date = serializers.DateTimeField()
 
     class Meta:
         model = Ticket
-        fields = ("id", "owner", "appointment_date", "service_type")
+        fields = ("id", "owner", "appointment_date")
 
 
 class ImageSerializer(serializers.ModelSerializer):
@@ -75,7 +75,7 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 class TicketTermsApprovedSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(max_length=5544)
+    id = serializers.CharField(max_length=555544)
 
     class Meta:
         model = Ticket
@@ -102,25 +102,40 @@ class TicketConnectorDetailSerializer(serializers.ModelSerializer):
         request = self.context["request"]
         instance.connector = request.user.id
         instance.pro = request.data.get("pro")
-        instance.appointment_date = request.data.get("appointment_date")
+        instance.service_type = request.data.get("service_type")
         instance.save()
-        FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
-        confirm_link = FRONTEND_URL + 'ticket/confirm/' + str(instance.id)
-        pro = User.objects.get(id=instance.pro)
-        owner = User.objects.get(id=instance.owner.id)
-        # email_body = 'Hi '+pro.username + \
-        #     ' Ticket İnformations \n' + pro.company_name
-        # data = {'email_body': email_body, 'to_email': pro.email,
-        #         'email_subject': 'Ticket İnformations'}
 
-        subject, from_email = 'Ticket Detail ', 'bbankdummymail@gmail.com'
-        html_content = render_to_string('ticket_detail.html', {'owner': owner, 'pro': pro, "appointment_date": request.data.get("appointment_date"), "confirm_link": confirm_link
-                                                               })
-        text_content = strip_tags(html_content)
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [
-                                     pro.email, owner.email])
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
+        if instance.terms_approved == False:
+            FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
+            owner = User.objects.get(id=instance.owner.id)
+
+            terms_approved_link = FRONTEND_URL + \
+                'terms_approved/' + str(instance.id)
+            subject, from_email, to = 'Terms Approved', 'bbankdummymail@gmail.com', owner.email
+
+            html_content = render_to_string('terms_approved_link.html', {
+                                            'terms_approved_link': terms_approved_link, 'user': owner, 'ticket': instance})
+            text_content = strip_tags(html_content)
+            msg = EmailMultiAlternatives(
+                subject, text_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+        # confirm_link = FRONTEND_URL + 'ticket/confirm/' + str(instance.id)
+        # pro = User.objects.get(id=instance.pro)
+        # owner = User.objects.get(id=instance.owner.id)
+        # # email_body = 'Hi '+pro.username + \
+        # #     ' Ticket İnformations \n' + pro.company_name
+        # # data = {'email_body': email_body, 'to_email': pro.email,
+        # #         'email_subject': 'Ticket İnformations'}
+
+        # subject, from_email = 'Ticket Detail ', 'bbankdummymail@gmail.com'
+        # html_content = render_to_string('ticket_detail.html', {'owner': owner, 'pro': pro, "appointment_date": request.data.get("appointment_date"), "confirm_link": confirm_link
+        #                                                        })
+        # text_content = strip_tags(html_content)
+        # msg = EmailMultiAlternatives(subject, text_content, from_email, [
+        #                              pro.email, owner.email])
+        # msg.attach_alternative(html_content, "text/html")
+        # msg.send()
 
         return instance
 
