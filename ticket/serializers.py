@@ -52,8 +52,8 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class FeedbackSerializers(serializers.ModelSerializer):
-    owner = UserTicketOwnerSerializer(read_only=True)
-    # ticket = TicketClientDetailSerializer(read_only=True)
+    owner = serializers.StringRelatedField(read_only=True)
+    ticket = TicketClientDetailSerializer(read_only=True)
     feedback_images = ImageSerializer(many=True, read_only=True)
     content = serializers.CharField()
 

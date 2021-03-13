@@ -173,8 +173,8 @@ Method iki
 
 class FeedBackDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FeedbackSerializers
-    permission_classes = (permissions.IsAuthenticated,)
-    queryset = Ticket.objects.all()
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly,)
+    queryset = Feedback.objects.all()
     lookup_field = 'id'
 
 
