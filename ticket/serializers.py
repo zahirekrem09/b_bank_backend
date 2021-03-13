@@ -54,11 +54,12 @@ class ImageSerializer(serializers.ModelSerializer):
 class FeedbackSerializers(serializers.ModelSerializer):
     owner = UserTicketOwnerSerializer(read_only=True)
     # ticket = TicketClientDetailSerializer(read_only=True)
-    feedback_images = ImageSerializer(many=True)
+    feedback_images = ImageSerializer(many=True, read_only=True)
+    content = serializers.CharField()
 
     class Meta:
         model = Feedback
-        fields = "__all__"
+        fields = ('id', 'owner', 'ticket', 'feedback_images', 'content')
 
 
 class TicketSerializer(serializers.ModelSerializer):
