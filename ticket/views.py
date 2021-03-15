@@ -91,7 +91,7 @@ class ConfirmTicketsView(APIView):
 
 class TicketListView(generics.ListAPIView):
     serializer_class = TicketSerializer
-    permission_classes = (permissions.IsAuthenticated, IsConnectorUser,)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = Ticket.objects.all()
     filter_backends = (filters.SearchFilter, filters.OrderingFilter,)
     search_fields = ("owner__username", 'email', 'first_name', 'last_name',)

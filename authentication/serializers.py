@@ -9,7 +9,6 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
-
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     @classmethod
@@ -218,3 +217,14 @@ class UserTicketOwnerSerializer(serializers.ModelSerializer):
 
     def get_preferred_lang(self, obj):
         return obj.get_preferred_lang_display()
+
+
+class UserTicketProSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    email = serializers.EmailField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    address = serializers.CharField()
+    company_name = serializers.CharField()
+    phone_number = serializers.CharField()
+    phone_number2 = serializers.CharField()

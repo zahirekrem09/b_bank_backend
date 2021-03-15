@@ -1,12 +1,12 @@
 from django.db.models.query import QuerySet
 from rest_framework import serializers
 from .models import FeedBackImage, Feedback, Ticket
-from authentication.serializers import UserTicketOwnerSerializer
+from authentication.serializers import UserTicketOwnerSerializer, UserTicketProSerializer
 from authentication.models import User
-from authentication.utils import Util
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from rest_framework.generics import get_object_or_404
 
 
 # class Pro(serializers.PrimaryKeyRelatedField):
@@ -66,6 +66,7 @@ class TicketSerializer(serializers.ModelSerializer):
     owner = UserTicketOwnerSerializer(read_only=True)
     feedbacks = FeedbackSerializers(many=True)
     service_type = serializers.SerializerMethodField()
+    pro_detail = serializers.SerializerMethodField()
 
     class Meta:
         model = Ticket
@@ -73,6 +74,15 @@ class TicketSerializer(serializers.ModelSerializer):
 
     def get_service_type(self, obj):
         return obj.get_service_type_display()
+
+    def get_pro_detail(self, obj):
+        try:
+            pro_detail = get_object_or_404(User, pk=obj.pro)
+            serializer = UserTicketProSerializer(pro_detail)
+            # print(serializer.data)
+            return serializer.data
+        except:
+            pass
 
 
 class TicketTermsApprovedSerializer(serializers.ModelSerializer):
