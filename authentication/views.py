@@ -73,12 +73,14 @@ class ConnectorRegisterView(generics.GenericAPIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
+        print(request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         user_data = serializer.data
         user = User.objects.get(email=user_data['email'])
         user.is_connector = True
         user.save()
+        print(user)
         FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
 
         token = RefreshToken.for_user(user).access_token
@@ -100,26 +102,28 @@ class SponsorRegisterView(generics.GenericAPIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        user_data = serializer.data
-        user = User.objects.get(email=user_data['email'])
-        user.is_sponsor = True
-        user.save()
-        FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            user_data = serializer.data
+            user = User.objects.get(email=user_data['email'])
+            user.is_sponsor = True
+            user.save()
+            FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
 
-        token = RefreshToken.for_user(user).access_token
-        verify_link = FRONTEND_URL + 'email-verify/' + str(token)
-        subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
-        current_site = get_current_site(request).domain
-        html_content = render_to_string('verify_email.html', {
-                                        'verify_link': verify_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': user})
-        text_content = strip_tags(html_content)
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
+            token = RefreshToken.for_user(user).access_token
+            verify_link = FRONTEND_URL + 'email-verify/' + str(token)
+            subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
+            current_site = get_current_site(request).domain
+            html_content = render_to_string('verify_email.html', {
+                                            'verify_link': verify_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': user})
+            text_content = strip_tags(html_content)
+            msg = EmailMultiAlternatives(
+                subject, text_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
 
-        return Response(user_data, status=status.HTTP_201_CREATED)
+            return Response(user_data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProRegisterView(generics.GenericAPIView):
@@ -127,33 +131,35 @@ class ProRegisterView(generics.GenericAPIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        user_data = serializer.data
-        user = User.objects.get(email=user_data['email'])
-        user.is_pro = True
-        user.company_name = request.data['company_name']
-        user.for_gender = request.data['for_gender']
-        user.zip_address = request.data['zip_address']
-        user.about_me = request.data['about_me']
-        user.service_type = request.data['service_type']
-        user.reserved_capacity = request.data['reserved_capacity']
-        user.save()
-        FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            user_data = serializer.data
+            user = User.objects.get(email=user_data['email'])
+            user.is_pro = True
+            user.company_name = request.data['company_name']
+            user.for_gender = request.data['for_gender']
+            user.zip_address = request.data['zip_address']
+            user.about_me = request.data['about_me']
+            user.service_type = request.data['service_type']
+            user.reserved_capacity = request.data['reserved_capacity']
+            user.save()
+            FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
 
-        token = RefreshToken.for_user(user).access_token
-        verify_link = FRONTEND_URL + 'email-verify/' + str(token)
-        subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
-        current_site = get_current_site(request).domain
-        html_content = render_to_string('verify_email.html', {
-                                        'verify_link': verify_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': user})
-        text_content = strip_tags(html_content)
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
+            token = RefreshToken.for_user(user).access_token
+            verify_link = FRONTEND_URL + 'email-verify/' + str(token)
+            subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
+            current_site = get_current_site(request).domain
+            html_content = render_to_string('verify_email.html', {
+                                            'verify_link': verify_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': user})
+            text_content = strip_tags(html_content)
+            msg = EmailMultiAlternatives(
+                subject, text_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
 
-        # Util.send_email(data)
-        return Response(self.serializer_class(User.objects.get(email=user_data['email'])).data, status=status.HTTP_201_CREATED)
+            # Util.send_email(data)
+            return Response(self.serializer_class(User.objects.get(email=user_data['email'])).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class VerifyEmail(views.APIView):
