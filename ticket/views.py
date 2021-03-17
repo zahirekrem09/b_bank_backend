@@ -43,7 +43,7 @@ class CreateTicketsView(APIView):
         # msg.attach_alternative(html_content, "text/html")
         # msg.send()
 
-        return Response(self.serializer_class(ticket).data, status=status.HTTP_201_CREATED)
+        return Response(TicketSerializer(ticket).data, status=status.HTTP_201_CREATED)
 
 
 class TicketTermsApprovedView(APIView):
@@ -105,10 +105,12 @@ class TicketListView(generics.ListAPIView):
     def get_queryset(self):
         queryset = Ticket.objects.all().order_by('-created_at')
         if self.request.user.is_pro == True:
-            queryset = Ticket.objects.filter(pro=self.request.user.id)
+            queryset = Ticket.objects.filter(
+                pro=self.request.user.id).order_by('-created_at')
             return queryset
         elif self.request.user.is_client == True:
-            queryset = Ticket.objects.filter(owner=self.request.user)
+            queryset = Ticket.objects.filter(
+                owner=self.request.user).order_by('-created_at')
             return queryset
         else:
             return queryset

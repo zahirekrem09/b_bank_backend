@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin)
@@ -7,16 +8,18 @@ from django.utils import timezone
 
 def user_directory_path(instance, filename):
     return 'profil_images/{0}/{1}'.format(instance.id, filename)
+
+
 class UserManager(BaseUserManager):
 
-    def create_user(self, username,  email, first_name, last_name, gdpr_consent,phone_number, password=None, **extra):
+    def create_user(self, username,  email, first_name, last_name, gdpr_consent, phone_number, password=None, **extra):
         if username is None:
             raise TypeError('Users should have a username')
         if email is None:
             raise TypeError('Users should have a Email')
 
         user = self.model(username=username,
-                          email=self.normalize_email(email), first_name=first_name, last_name=last_name,phone_number = phone_number, gdpr_consent=gdpr_consent)
+                          email=self.normalize_email(email), first_name=first_name, last_name=last_name, phone_number=phone_number, gdpr_consent=gdpr_consent)
         user.set_password(password,)
         # user.is_client = True
         user.save()
@@ -59,7 +62,6 @@ class UserManager(BaseUserManager):
         user.is_client = True
         user.save()
         return user
-
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -168,7 +170,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-    
+
     class Meta:
         ordering = ("created_at",)
 
@@ -178,3 +180,8 @@ class User(AbstractBaseUser, PermissionsMixin):
             'refresh': str(refresh),
             'access': str(refresh.access_token)
         }
+
+
+# https://tech.serhatteker.com/post/2020-01/uuid-primary-key/
+# class ModelUsingUUID(models.Model):
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
