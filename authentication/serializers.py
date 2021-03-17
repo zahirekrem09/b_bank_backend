@@ -30,14 +30,14 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['email', 'username', 'password', 'first_name',
                   'last_name', 'phone_number', 'gdpr_consent']
 
-    def validate(self, attrs):
-        email = attrs.get('email', '')
-        username = attrs.get('username', '')
+    # def validate(self, attrs):
+    #     email = attrs.get('email', '')
+    #     username = attrs.get('username', '')
 
-        if not username.isalnum():
-            raise serializers.ValidationError(
-                self.default_error_messages)
-        return attrs
+    #     if not username.isalnum():
+    #         raise serializers.ValidationError(
+    #             self.default_error_messages)
+    #     return attrs
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
@@ -207,7 +207,7 @@ class UserTicketOwnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "username", "email", "first_name",
-                  "last_name", "gender", "zip_address", "phone_number", "phone_number2", "about_me", "transportation_type", "preferred_lang", "gdpr_consent", "is_gray")
+                  "last_name", "gender", "zip_address", "phone_number", "phone_number2", "about_me", "transportation_type", "preferred_lang", "gdpr_consent", "is_gray", "company_name", "address")
 
     def get_gender(self, obj):
         return obj.get_gender_display()

@@ -7,6 +7,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from rest_framework.generics import get_object_or_404
+from django.utils import timezone
 
 
 # class Pro(serializers.PrimaryKeyRelatedField):
@@ -67,6 +68,7 @@ class TicketSerializer(serializers.ModelSerializer):
     feedbacks = FeedbackSerializers(many=True)
     service_type = serializers.SerializerMethodField()
     pro_detail = serializers.SerializerMethodField()
+    ticket_status = serializers.SerializerMethodField()
 
     class Meta:
         model = Ticket
@@ -75,14 +77,35 @@ class TicketSerializer(serializers.ModelSerializer):
     def get_service_type(self, obj):
         return obj.get_service_type_display()
 
+    # def get_pro_detail(self, obj):
+    #     try:
+    #         pro_detail = get_object_or_404(User, pk=obj.pro)
+    #         serializer = UserTicketProSerializer(pro_detail)
+    #         # print(serializer.data)
+    #         return serializer.data
+    #     except:
+    #         pass
+
     def get_pro_detail(self, obj):
         try:
             pro_detail = get_object_or_404(User, pk=obj.pro)
-            serializer = UserTicketProSerializer(pro_detail)
+            serializer = UserTicketOwnerSerializer(pro_detail)
             # print(serializer.data)
             return serializer.data
         except:
             pass
+
+    def get_ticket_status(self, obj):
+        if(obj.terms_approved == True and obj.pro and obj.appointment_date and obj.appointment_date < timezone.now()):
+            return "4"
+        elif (obj.terms_approved == True and obj.pro and obj.appointment_date):
+            return "3"
+        elif(obj.terms_approved == True and obj.pro):
+            return "2"
+        elif (obj.terms_approved == True):
+            return "1"
+        else:
+            return "0"
 
 
 class TicketTermsApprovedSerializer(serializers.ModelSerializer):
