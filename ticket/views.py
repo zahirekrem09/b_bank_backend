@@ -17,6 +17,7 @@ from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.sites.shortcuts import get_current_site
 from rest_framework_simplejwt.tokens import RefreshToken
+from bbank.pagination import SmallPagination, LargePagination
 import jwt
 
 
@@ -92,13 +93,17 @@ class ConfirmTicketsView(APIView):
 class TicketListView(generics.ListAPIView):
     serializer_class = TicketSerializer
     permission_classes = (permissions.IsAuthenticated,)
-    queryset = Ticket.objects.all()
+    pagination_class = SmallPagination
+    queryset = Ticket.objects.all().order_by('-created_at')
     filter_backends = (filters.SearchFilter, filters.OrderingFilter,)
-    search_fields = ("owner__username", 'email', 'first_name', 'last_name',)
+    search_fields = ("owner__username", 'email', 'first_name',
+                     'last_name', 'company_name')
+    # ordering_fields = ['is_gray', 'is_client',
+    #                    'is_pro', 'is_sponsor', 'is_connector']
     lookup_field = 'id'
 
     def get_queryset(self):
-        queryset = Ticket.objects.all()
+        queryset = Ticket.objects.all().order_by('-created_at')
         if self.request.user.is_pro == True:
             queryset = Ticket.objects.filter(pro=self.request.user.id)
             return queryset
@@ -143,7 +148,7 @@ class FeedBackCreateView(generics.CreateAPIView):
     serializer_class = FeedbackCreateSerializers
 
     def perform_create(self, serializer):
-        ticket_pk = self.kwargs.get('kitap_pk')
+        ticket_pk = self.kwargs.get('ticket_id')
         ticket = get_object_or_404(Ticket, pk=ticket_pk)
         serializer.save(owner=self.request.user, ticket=ticket)
 

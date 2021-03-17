@@ -4,7 +4,7 @@ from .serializers import (RegisterSerializer, EmailVerificationSerializer,
 from .models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-from rest_framework import generics, status, views, permissions
+from rest_framework import generics, status, views, permissions, filters
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .utils import Util
@@ -21,7 +21,7 @@ from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .permission import IsConnectorUser
-import re
+from bbank.pagination import SmallPagination, LargePagination
 from django.db.models import Q, Count, Subquery, OuterRef
 
 
@@ -289,6 +289,12 @@ class UserDetail(generics.RetrieveUpdateAPIView):
 class UserListView(generics.ListAPIView):
     serializer_class = UserDetailSerializer
     permission_classes = (permissions.IsAuthenticated, IsConnectorUser,)
+    pagination_class = SmallPagination
+    filter_backends = (filters.SearchFilter, filters.OrderingFilter,)
+    search_fields = ("username", 'email', 'first_name',
+                     'last_name', 'company_name')
+    ordering_fields = ['is_gray', 'is_client',
+                       'is_pro', 'is_sponsor', 'is_connector']
     queryset = User.objects.all()
     lookup_field = 'id'
 
