@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from rest_framework.generics import get_object_or_404
 from django.utils import timezone
+from django.db.models import Q
 
 
 # class Pro(serializers.PrimaryKeyRelatedField):
@@ -24,6 +25,23 @@ def pro_user_feild():
         pro_user = []
 
     return pro_user
+
+
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FeedBackImage
+        fields = ('image', "feedback")
+
+
+class FeedbackSerializers(serializers.ModelSerializer):
+    owner = serializers.StringRelatedField(read_only=True)
+    # ticket = TicketClientDetailSerializer(read_only=True)
+    feedback_images = ImageSerializer(many=True, read_only=True)
+    content = serializers.CharField()
+
+    class Meta:
+        model = Feedback
+        fields = ('id', 'owner', 'ticket', 'feedback_images', 'content')
 
 
 class TicketClientCreateSerializer(serializers.ModelSerializer):
@@ -46,21 +64,7 @@ class TicketClientDetailSerializer(serializers.ModelSerializer):
         fields = ("id", "owner", "appointment_date")
 
 
-class ImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FeedBackImage
-        fields = ('image', "feedback")
-
-
-class FeedbackSerializers(serializers.ModelSerializer):
-    owner = serializers.StringRelatedField(read_only=True)
-    ticket = TicketClientDetailSerializer(read_only=True)
-    feedback_images = ImageSerializer(many=True, read_only=True)
-    content = serializers.CharField()
-
-    class Meta:
-        model = Feedback
-        fields = ('id', 'owner', 'ticket', 'feedback_images', 'content')
+# İd ticket id
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -69,6 +73,10 @@ class TicketSerializer(serializers.ModelSerializer):
     service_type = serializers.SerializerMethodField()
     pro_detail = serializers.SerializerMethodField()
     ticket_status = serializers.SerializerMethodField()
+    feedback_url = serializers.HyperlinkedIdentityField(
+        view_name='feedback',
+        lookup_field='id'
+    )
 
     class Meta:
         model = Ticket
@@ -94,8 +102,12 @@ class TicketSerializer(serializers.ModelSerializer):
             return serializer.data
         except:
             pass
+# TODO: Step 5 eklenecek feedbacks girmiş mi
 
     def get_ticket_status(self, obj):
+        request = self.context['request']
+        if(obj.terms_approved == True and obj.pro and obj.appointment_date and obj.appointment_date < timezone.now() and Feedback.objects.filter(ticket=obj, owner=request.user).exists()):
+            return "5"
         if(obj.terms_approved == True and obj.pro and obj.appointment_date and obj.appointment_date < timezone.now()):
             return "4"
         elif (obj.terms_approved == True and obj.pro and obj.appointment_date):

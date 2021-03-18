@@ -128,7 +128,7 @@ class ClientTicketsListView(generics.ListAPIView):
 
 
 class ClientTicketsDetailView(generics.RetrieveUpdateAPIView):
-    serializer_class = TicketClientDetailSerializer
+    serializer_class = TicketSerializer
     permission_classes = (permissions.IsAuthenticated, IsOwner,)
     queryset = Ticket.objects.all()
     lookup_field = 'id'
@@ -145,14 +145,14 @@ class ConnectorTicketsDetailView(generics.RetrieveUpdateAPIView):
     lookup_field = 'id'
 
 
-class FeedBackCreateView(generics.CreateAPIView):
-    queryset = Feedback.objects.all()
-    serializer_class = FeedbackCreateSerializers
+# class FeedBackCreateView(generics.CreateAPIView):
+#     queryset = Feedback.objects.all()
+#     serializer_class = FeedbackCreateSerializers
 
-    def perform_create(self, serializer):
-        ticket_pk = self.kwargs.get('ticket_id')
-        ticket = get_object_or_404(Ticket, pk=ticket_pk)
-        serializer.save(owner=self.request.user, ticket=ticket)
+#     def perform_create(self, serializer):
+#         ticket_pk = self.kwargs.get('ticket_id')
+#         ticket = get_object_or_404(Ticket, pk=ticket_pk)
+#         serializer.save(owner=self.request.user, ticket=ticket)
 
 # TODO: Sadece kendi ticketi için permisson yazılıcak
 
@@ -160,22 +160,24 @@ class FeedBackCreateView(generics.CreateAPIView):
 """
 Method iki
 """
-# class FeedBackCreateView(APIView):
-#     # serializer_class = FeedbackSerializers
-#     permission_classes = (permissions.IsAuthenticated,)
-#     # queryset = Feedback.objects.all()
-#     # lookup_field = 'id'
-#     serializer_class = FeedbackCreateSerializers
 
-#     def post(self, request, id):
-#         ticket = get_object_or_404(Ticket, id=id)
-#         # print(ticket.id)
-#         serializer = FeedbackCreateSerializers(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save(owner=request.user, ticket=ticket)
-#             return Response(serializer.data, status=200)
-#         else:
-#             return Response({"errors": serializer.errors}, status=400)
+
+class FeedBackCreateView(APIView):
+    # serializer_class = FeedbackSerializers
+    permission_classes = (permissions.IsAuthenticated,)
+    # queryset = Feedback.objects.all()
+    lookup_field = 'id'
+    serializer_class = FeedbackCreateSerializers
+
+    def post(self, request, id):
+        ticket = get_object_or_404(Ticket, id=id)
+        # print(ticket.id)
+        serializer = FeedbackCreateSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save(owner=request.user, ticket=ticket)
+            return Response(serializer.data, status=200)
+        else:
+            return Response({"errors": serializer.errors}, status=400)
 
 
 class FeedBackDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -207,7 +209,7 @@ class ImageView(APIView):
     def post(self, request, id, *args, **kwargs):
         # feedback = request.data['feedback']
         feedback = get_object_or_404(Feedback, id=id)
-        print(feedback)
+        # print(feedback)
 
         # converts querydict to original dict
         images = dict((request.data).lists())['image']
