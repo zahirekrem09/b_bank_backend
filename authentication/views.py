@@ -25,9 +25,25 @@ from bbank.pagination import SmallPagination, LargePagination
 from django.db.models import Q, Count, Subquery, OuterRef
 
 
+"""
+@Path: /auth/token => path('token/', MyObtainTokenPairView.as_view(), name='token_obtain_pair')
+@Method: POST
+@Permisson: Public
+@Decs: Altarnatif Login
+"""
+
+
 class MyObtainTokenPairView(TokenObtainPairView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = MyTokenObtainPairSerializer
+
+
+"""
+@Path: /auth/register => path('register/', RegisterView.as_view(), name='register'),
+@Method: POST
+@Permisson: Public
+@Decs: Client Register
+"""
 
 
 class RegisterView(generics.GenericAPIView):
@@ -68,6 +84,14 @@ class RegisterView(generics.GenericAPIView):
         return Response(user_data, status=status.HTTP_201_CREATED)
 
 
+"""
+@Path: /auth/'register-connector => path('register-connector/', ConnectorRegisterView.as_view(),name='register-connector'),
+@Method: POST
+@Permisson: Public
+@Decs: Connector Register
+"""
+
+
 class ConnectorRegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
@@ -97,6 +121,14 @@ class ConnectorRegisterView(generics.GenericAPIView):
         return Response(user_data, status=status.HTTP_201_CREATED)
 
 
+"""
+@Path: /auth/register => path('register-sponsor/', SponsorRegisterView.as_view(),name='register-sponsor'),
+@Method: POST
+@Permisson: Public
+@Decs: Sponsor Register
+"""
+
+
 class SponsorRegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
@@ -124,6 +156,14 @@ class SponsorRegisterView(generics.GenericAPIView):
 
             return Response(user_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+@Path: /auth/register-pro => path('register-pro/', ProRegisterView.as_view(), name='register-pro'),
+@Method: POST
+@Permisson: Public
+@Decs: Pro Register
+"""
 
 
 class ProRegisterView(generics.GenericAPIView):
@@ -162,6 +202,14 @@ class ProRegisterView(generics.GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+"""
+@Path: /auth/email-verify => path('email-verify/', VerifyEmail.as_view(), name='email-verify'),
+@Method: POST
+@Permisson: Public
+@Decs: Email Activate
+"""
+
+
 class VerifyEmail(views.APIView):
     serializer_class = EmailVerificationSerializer
 
@@ -185,6 +233,14 @@ class VerifyEmail(views.APIView):
             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+"""
+@Path: /auth/login => path('login/', LoginAPIView.as_view(), name='login'),
+@Method: POST
+@Permisson: Public
+@Decs: Login
+"""
+
+
 class LoginAPIView(generics.GenericAPIView):
     serializer_class = LoginSerializer
 
@@ -192,6 +248,14 @@ class LoginAPIView(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+"""
+@Path: /auth/logout => path('logout/', LogoutAPIView.as_view(), name='logout'),
+@Method: POST
+@Permisson: Private
+@Decs: Login
+"""
 
 
 class LogoutAPIView(generics.GenericAPIView):
@@ -224,6 +288,15 @@ class LogoutView(views.APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+"""
+@Path: /auth/request-reset-email => path('request-reset-email', RequestPasswordResetEmail.as_view(),
+                            name='request-reset-email'),
+@Method: POST
+@Permisson: Public
+@Decs: Reset Pasword Send Email 
+"""
+
+
 class RequestPasswordResetEmail(generics.GenericAPIView):
     serializer_class = ResetPasswordEmailRequestSerializer
 
@@ -249,6 +322,15 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
         return Response({'success': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
 
 
+"""
+@Path: /auth/password-reset/<uidb64>/<token>/ => path('password-reset/<uidb64>/<token>/',
+                                  PasswordTokenCheckAPI.as_view(), name='password-reset-confirm'),
+@Method: GET
+@Permisson: Public
+@Decs: Password Reset Confirm 
+"""
+
+
 class PasswordTokenCheckAPI(generics.GenericAPIView):
     def get(self, request, uidb64, token):
 
@@ -265,6 +347,15 @@ class PasswordTokenCheckAPI(generics.GenericAPIView):
             return Response({'error': 'Token is not valid, please request a new one'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
+"""
+@Path: /auth/password-reset-complete => path('password-reset-complete', SetNewPasswordAPIView.as_view(),
+                                                  name='password-reset-complete'),
+@Method: PATCH
+@Permisson: Public
+@Decs: Set New Password  
+"""
+
+
 class SetNewPasswordAPIView(generics.GenericAPIView):
     serializer_class = SetNewPasswordSerializer
 
@@ -272,6 +363,14 @@ class SetNewPasswordAPIView(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response({'success': True, 'message': 'Password reset success'}, status=status.HTTP_200_OK)
+
+
+"""
+@Path: /auth/user-detail/<str:username> => path('user-detail/<str:username>', UserDetail.as_view(), name='user-detail'),
+@Method: GET
+@Permisson: Private
+@Decs: User Detail   
+"""
 
 
 class UserDetail(generics.RetrieveUpdateAPIView):
@@ -284,6 +383,14 @@ class UserDetail(generics.RetrieveUpdateAPIView):
         username = self.kwargs["username"]
         queryset = queryset.filter(username=username)
         return queryset
+
+
+"""
+@Path: /auth/user-list => path('user-list/', UserListView.as_view(), name='user-list'),
+@Method: GET
+@Permisson: Private just Connector 
+@Decs: User List   
+"""
 
 
 class UserListView(generics.ListAPIView):
