@@ -103,7 +103,6 @@ class TicketSerializer(serializers.ModelSerializer):
             return serializer.data
         except:
             pass
-# TODO: Step 5 eklenecek feedbacks girmiş mi
 
     def get_ticket_status(self, obj):
         request = self.context['request']

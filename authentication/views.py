@@ -385,6 +385,18 @@ class UserDetail(generics.RetrieveUpdateAPIView):
         return queryset
 
 
+class ConnectorUserDetail(generics.RetrieveAPIView):
+    serializer_class = UserDetailSerializer
+    permission_classes = (permissions.IsAuthenticated, IsConnectorUser)
+    lookup_field = 'username'
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        username = self.kwargs["username"]
+        queryset = queryset.filter(username=username)
+        return queryset
+
+
 """
 @Path: /auth/user-list => path('user-list/', UserListView.as_view(), name='user-list'),
 @Method: GET
