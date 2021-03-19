@@ -192,11 +192,16 @@ class SetNewPasswordSerializer(serializers.Serializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
+    service_type = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         exclude = ("password", )
         # fields = '__all__'
         lookup_field = "username"
+
+    def get_service_type(self, obj):
+        return obj.get_service_type_display()
 
 
 class UserTicketOwnerSerializer(serializers.ModelSerializer):
