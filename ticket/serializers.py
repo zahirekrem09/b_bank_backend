@@ -115,7 +115,7 @@ class TicketSerializer(serializers.ModelSerializer):
             return "3"
         elif(obj.terms_approved == True and obj.pro):
             return "2"
-        elif (obj.terms_approved == True):
+        elif (obj.pro == True):
             return "1"
         else:
             return "0"
