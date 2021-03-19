@@ -117,7 +117,7 @@ class TicketListView(generics.ListAPIView):
 
 
 class ClientTicketsListView(generics.ListAPIView):
-    serializer_class = TicketSerializer
+    serializer_class = TicketClientDetailSerializer
     permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly,)
     queryset = Ticket.objects.all()
     lookup_field = 'id'
