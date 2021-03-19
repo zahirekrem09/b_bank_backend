@@ -169,13 +169,19 @@ class FeedBackCreateView(APIView):
     lookup_field = 'id'
     serializer_class = FeedbackCreateSerializers
 
-    def post(self, request, id):
+    def post(self, request, id,  **extra):
         ticket = get_object_or_404(Ticket, id=id)
         # print(ticket.id)
         serializer = FeedbackCreateSerializers(data=request.data)
         if serializer.is_valid():
-            serializer.save(owner=request.user, ticket=ticket)
-            return Response(serializer.data, status=200)
+            # serializer.save(owner=request.user, ticket=ticket)
+            fed = Feedback.objects.create(
+                owner=request.user, ticket=ticket, content=serializer.data["content"], ** extra)
+            print(fed)
+            # fed2 = Feedback.objects.get(
+            #     ticket=ticket, owner=request.user, id=self.id)
+            # print(fed2)
+            return Response(FeedbackSerializers(fed).data, status=201)
         else:
             return Response({"errors": serializer.errors}, status=400)
 
