@@ -75,7 +75,8 @@ class TicketSerializer(serializers.ModelSerializer):
     ticket_status = serializers.SerializerMethodField()
     feedback_url = serializers.HyperlinkedIdentityField(
         view_name='feedback',
-        lookup_field='id'
+        lookup_field='id',
+        read_only=True,
     )
 
     class Meta:

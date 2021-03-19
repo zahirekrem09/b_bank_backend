@@ -43,7 +43,7 @@ class CreateTicketsView(APIView):
         # msg.attach_alternative(html_content, "text/html")
         # msg.send()
 
-        return Response(TicketSerializer(ticket).data, status=status.HTTP_201_CREATED)
+        return Response(TicketSerializer(ticket, context={'request': request}).data, status=status.HTTP_201_CREATED)
 
 
 class TicketTermsApprovedView(APIView):
