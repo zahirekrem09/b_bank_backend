@@ -191,3 +191,4 @@ class FeedbackCreateSerializers(serializers.ModelSerializer):
     class Meta:
         model = Feedback
         fields = ("content",)
+        read_only_fields = ("ticket",)

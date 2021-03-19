@@ -14,7 +14,7 @@ urlpatterns = [
     path('feedback-imageupload/<int:id>', ImageView.as_view(),
          name="feedback-imageupload"),
 
-    path('feedback/<int:id>/', FeedBackCreateView.as_view(),
+    path('feedback-create/<int:id>/', FeedBackCreateView.as_view(),
          name="feedback"),
     path('feedback-list/', FeedBackListView.as_view(),
          name="feedback-list"),
