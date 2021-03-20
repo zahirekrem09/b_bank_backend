@@ -414,11 +414,11 @@ class UserListView(generics.ListAPIView):
                      'last_name', 'company_name')
     ordering_fields = ['is_gray', 'is_client',
                        'is_pro', 'is_sponsor', 'is_connector']
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('-created_at')
     lookup_field = 'id'
 
     def get_queryset(self):
-        queryset = User.objects.all()
+        queryset = User.objects.all().order_by('-created_at')
         if self.request.method.lower() != "get":
             return queryset
         keyword = self.request.GET.get('keyword')
