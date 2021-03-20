@@ -161,6 +161,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_sponsor = models.BooleanField(default=False)
     is_connector = models.BooleanField(default=False)
     gdpr_consent = models.BooleanField(default=False)
+    min_income = models.BooleanField(default=False)
 
     objects = UserManager()
 
