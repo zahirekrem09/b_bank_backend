@@ -31,17 +31,15 @@ class CreateTicketsView(APIView):
         ticket = Ticket.objects.create(owner=owner, email=owner.email,
                                        first_name=owner.first_name, last_name=owner.last_name, phone_number=owner.phone_number, about_me=owner.about_me, ** extra)
 
-        # FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
-
-        # terms_approved_link = FRONTEND_URL + 'terms_approved/' + str(ticket.id)
-        # subject, from_email, to = 'Terms Approved', 'bbankdummymail@gmail.com', owner.email
-        # current_site = get_current_site(request).domain
-        # html_content = render_to_string('terms_approved_link.html', {
-        #                                 'terms_approved_link': terms_approved_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': owner})
-        # text_content = strip_tags(html_content)
-        # msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-        # msg.attach_alternative(html_content, "text/html")
-        # msg.send()
+        FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
+        subject, from_email, to = 'Ticket Create Info', 'bbankdummymail@gmail.com', owner.email
+        current_site = get_current_site(request).domain
+        html_content = render_to_string('ticket_create_info.html', {
+                                        'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': owner})
+        text_content = strip_tags(html_content)
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
 
         return Response(TicketSerializer(ticket, context={'request': request}).data, status=status.HTTP_201_CREATED)
 
@@ -161,6 +159,8 @@ class ConnectorTicketsDetailView(generics.RetrieveUpdateAPIView):
 Method iki
 """
 
+# Her kullanıcı bir tane feddbacks yapsın
+
 
 class FeedBackCreateView(APIView):
     # serializer_class = FeedbackSerializers
@@ -175,8 +175,13 @@ class FeedBackCreateView(APIView):
         serializer = FeedbackCreateSerializers(data=request.data)
         if serializer.is_valid():
             # serializer.save(owner=request.user, ticket=ticket)
-            fed = Feedback.objects.create(
-                owner=request.user, ticket=ticket, content=serializer.data["content"], ** extra)
+            qs = Feedback.objects.filter(
+                owner=request.user, ticket=ticket)
+            if qs.exists():
+                qs[0].delete()
+            else:
+                fed = Feedback.objects.create(
+                    owner=request.user, ticket=ticket, content=serializer.data["content"], ** extra)
             print(fed)
             # fed2 = Feedback.objects.get(
             #     ticket=ticket, owner=request.user, id=self.id)
