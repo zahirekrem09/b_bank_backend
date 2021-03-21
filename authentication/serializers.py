@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from .models import User, UserManager
 from django.contrib import auth
@@ -119,11 +119,11 @@ class LoginSerializer(serializers.ModelSerializer):
         filtered_user_by_email = User.objects.filter(email=email)
         user = auth.authenticate(email=email, password=password)
         if not user:
-            raise AuthenticationFailed('Invalid credentials, try again')
+            raise ValidationError('Invalid credentials, try again')
         if not user.is_active:
-            raise AuthenticationFailed('Account disabled, contact admin')
+            raise ValidationError('Account disabled, contact admin')
         if not user.is_verified:
-            raise AuthenticationFailed('Email is not verified')
+            raise ValidationError('Email is not verified')
 
         return {
             'email': user.email,
