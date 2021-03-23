@@ -1,7 +1,8 @@
 from .serializers import (RegisterSerializer, EmailVerificationSerializer,
                           LoginSerializer, LogoutSerializer, ResetPasswordEmailRequestSerializer,
-                          SetNewPasswordSerializer, ProRegisterSerializer, UserDetailSerializer, MyTokenObtainPairSerializer)
+                          SetNewPasswordSerializer, ProRegisterSerializer, UserDetailSerializer, MyTokenObtainPairSerializer, )
 from .models import User
+from .renderers import UserJSONRenderer
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from rest_framework import generics, status, views, permissions, filters
@@ -15,14 +16,15 @@ from drf_yasg import openapi
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from .permission import IsCurrentUser
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .permission import IsConnectorUser
+from .permission import IsConnectorUser, IsCurrentUser
 from bbank.pagination import SmallPagination, LargePagination
+from bbank.utils import EmailUtil
 from django.db.models import Q, Count, Subquery, OuterRef
+from rest_framework.permissions import AllowAny
 
 
 """
@@ -65,22 +67,7 @@ class RegisterView(generics.GenericAPIView):
         #     ' Use the link below to verify your email \n' + absurl
         # data = {'email_body': email_body, 'to_email': user.email,
         #         'email_subject': 'Verify your email'}
-
-        # Util.send_email(data)
-        # print(f"user in db {user}")
-        FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
-
-        token = RefreshToken.for_user(user).access_token
-        verify_link = FRONTEND_URL + 'email-verify/' + str(token)
-        subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
-        current_site = get_current_site(request).domain
-        html_content = render_to_string('verify_email.html', {
-                                        'verify_link': verify_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': user})
-        text_content = strip_tags(html_content)
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
-
+        EmailUtil.send_email(request, user)
         return Response(user_data, status=status.HTTP_201_CREATED)
 
 
@@ -97,27 +84,13 @@ class ConnectorRegisterView(generics.GenericAPIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        print(request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         user_data = serializer.data
         user = User.objects.get(email=user_data['email'])
         user.is_connector = True
         user.save()
-        print(user)
-        FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
-
-        token = RefreshToken.for_user(user).access_token
-        verify_link = FRONTEND_URL + 'email-verify/' + str(token)
-        subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
-        current_site = get_current_site(request).domain
-        html_content = render_to_string('verify_email.html', {
-                                        'verify_link': verify_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': user})
-        text_content = strip_tags(html_content)
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
-
+        EmailUtil.send_email(request, user)
         return Response(user_data, status=status.HTTP_201_CREATED)
 
 
@@ -140,19 +113,7 @@ class SponsorRegisterView(generics.GenericAPIView):
             user = User.objects.get(email=user_data['email'])
             user.is_sponsor = True
             user.save()
-            FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
-
-            token = RefreshToken.for_user(user).access_token
-            verify_link = FRONTEND_URL + 'email-verify/' + str(token)
-            subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
-            current_site = get_current_site(request).domain
-            html_content = render_to_string('verify_email.html', {
-                                            'verify_link': verify_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': user})
-            text_content = strip_tags(html_content)
-            msg = EmailMultiAlternatives(
-                subject, text_content, from_email, [to])
-            msg.attach_alternative(html_content, "text/html")
-            msg.send()
+            EmailUtil.send_email(request, user)
 
             return Response(user_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -183,21 +144,7 @@ class ProRegisterView(generics.GenericAPIView):
             user.service_type = request.data['service_type']
             user.reserved_capacity = request.data['reserved_capacity']
             user.save()
-            FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
-
-            token = RefreshToken.for_user(user).access_token
-            verify_link = FRONTEND_URL + 'email-verify/' + str(token)
-            subject, from_email, to = 'Verify Your Email', 'bbankdummymail@gmail.com', user.email
-            current_site = get_current_site(request).domain
-            html_content = render_to_string('verify_email.html', {
-                                            'verify_link': verify_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': user})
-            text_content = strip_tags(html_content)
-            msg = EmailMultiAlternatives(
-                subject, text_content, from_email, [to])
-            msg.attach_alternative(html_content, "text/html")
-            msg.send()
-
-            # Util.send_email(data)
+            EmailUtil.send_email(request, user)
             return Response(self.serializer_class(User.objects.get(email=user_data['email'])).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -301,6 +248,7 @@ class LogoutView(views.APIView):
 
 class RequestPasswordResetEmail(generics.GenericAPIView):
     serializer_class = ResetPasswordEmailRequestSerializer
+    permission_classes = (AllowAny,)
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -334,6 +282,7 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
 
 
 class PasswordTokenCheckAPI(generics.GenericAPIView):
+
     def get(self, request, uidb64, token):
 
         try:
@@ -379,6 +328,7 @@ class UserDetail(generics.RetrieveUpdateAPIView):
     serializer_class = UserDetailSerializer
     permission_classes = (permissions.IsAuthenticated, IsCurrentUser)
     lookup_field = 'username'
+    # renderer_classes = (UserJSONRenderer,)
 
     def get_queryset(self):
         queryset = User.objects.all()
@@ -411,6 +361,7 @@ class UserListView(generics.ListAPIView):
     serializer_class = UserDetailSerializer
     permission_classes = (permissions.IsAuthenticated, IsConnectorUser,)
     pagination_class = SmallPagination
+    # renderer_classes = (UserJSONRenderer,)
     filter_backends = (filters.SearchFilter, filters.OrderingFilter,)
     search_fields = ("username", 'email', 'first_name',
                      'last_name', 'company_name')
