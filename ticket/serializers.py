@@ -16,15 +16,15 @@ from django.db.models import Q
 #     def display_value(self, instance):
 #         return instance.username
 
-# def pro_user_feild():
+def pro_user_feild():
 
-#     if User.objects.filter(is_pro=True).exists():
-#         pro_user = [(u.id, u.company_name)
-#                     for u in User.objects.filter(is_pro=True)]
-#     else:
-#         pro_user = []
+    if User.objects.filter(is_pro=True).exists():
+        pro_user = [(u.id, u.company_name)
+                    for u in User.objects.filter(is_pro=True)]
+    else:
+        pro_user = []
 
-#     return pro_user
+    return pro_user
 
 
 class ImageSerializer(serializers.ModelSerializer):
@@ -129,7 +129,7 @@ class TicketTermsApprovedSerializer(serializers.ModelSerializer):
 
 
 class TicketConnectorDetailSerializer(serializers.ModelSerializer):
-    # pro = serializers.ChoiceField(choices=pro_user_feild())
+    pro = serializers.ChoiceField(choices=pro_user_feild())
     connector = serializers.IntegerField(read_only=True)
     # service_type = serializers.SerializerMethodField()
     service_type = serializers.ChoiceField(choices=Ticket.SERVICE_TYPE_CHOICES)
