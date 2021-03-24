@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'django_filters',
 
     # Swagger
     # 'django.contrib.staticfiles',  # required for serving swagger ui's css/js files
@@ -129,6 +130,10 @@ REST_FRAMEWORK = {
 
     ),
     # 'EXCEPTION_HANDLER': 'bbank.custom_exception.core_exception_handler',
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+
+    ),
 
 }
 

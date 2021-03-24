@@ -4,3 +4,19 @@ TODO :3 TİCKETLAR OLUŞTURULUCAK 3 3
 TODO :4 eMAİL VERİFY eMAİL TEPLATE HAZIRLANACAK
 TODO :5 TİCKET APPROV OLDUKTAN SONRA PRO VE CLİENT a mail gönderilicek temp. hazırlanacak 
 TODO :6 feedback kısmı test edilicek 
+
+verify email backend :
+class ActivateUserAPIView(GenericAPIView):
+    def get(self, request, *args, **kwargs):
+        token = kwargs.pop('token')
+        user = jwt.decode(
+            token,
+            SECRET_KEY
+        )
+        activateUser = User.objects.filter(pk=user['id']).first()
+        domain = os.environ.get('FRONT_END_URL', 'local')
+        if not activateUser.is_active:
+            activateUser.is_active = True
+            activateUser.save()
+            # redirect page
+        return HttpResponseRedirect(domain)
