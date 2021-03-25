@@ -4,6 +4,7 @@ from .serializers import (RegisterSerializer, EmailVerificationSerializer,
 from .models import User
 from .renderers import UserJSONRenderer
 from django.contrib.sites.shortcuts import get_current_site
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework import generics, status, views, permissions, filters
 from rest_framework.response import Response
@@ -22,6 +23,7 @@ from bbank.utils import EmailUtil
 from django.db.models import Q, Count, Subquery, OuterRef
 from rest_framework.permissions import AllowAny
 from django_filters import rest_framework as djfilters
+from .coordinate import find_lat_long
 
 
 """
@@ -55,6 +57,11 @@ class RegisterView(generics.GenericAPIView):
         user_data = serializer.data
         user = User.objects.get(email=user_data['email'])
         user.is_client = True
+        user.zip_address = request.data['zip_address']
+        user.latitude = find_lat_long(user_data['zip_address']
+                                      )["geocodePoints"][0]["coordinates"][0]
+        user.longitude = find_lat_long(user_data['zip_address']
+                                       )["geocodePoints"][0]["coordinates"][1]
         user.save()
         # token = RefreshToken.for_user(user).access_token
         # current_site = get_current_site(request).domain
@@ -140,6 +147,10 @@ class ProRegisterView(generics.GenericAPIView):
             user.about_me = request.data['about_me']
             user.service_type = request.data['service_type']
             user.reserved_capacity = request.data['reserved_capacity']
+            user.latitude = find_lat_long(user_data['zip_address']
+                                          )["geocodePoints"][0]["coordinates"][0]
+            user.longitude = find_lat_long(user_data['zip_address']
+                                           )["geocodePoints"][0]["coordinates"][1]
             user.save()
             EmailUtil.send_email(request, user)
             return Response(self.serializer_class(User.objects.get(email=user_data['email'])).data, status=status.HTTP_201_CREATED)

@@ -7,6 +7,8 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from .validate import valid_zipcode
+
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -24,11 +26,12 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         max_length=30, min_length=6, write_only=True)
+    zip_address = serializers.CharField(validators=[valid_zipcode])
 
     class Meta:
         model = User
         fields = ['email', 'username', 'password', 'first_name',
-                  'last_name', 'phone_number', 'gdpr_consent']
+                  'last_name', 'phone_number', 'gdpr_consent', 'zip_address', ]
 
     # def validate(self, attrs):
     #     email = attrs.get('email', '')
@@ -46,6 +49,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class ProRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         max_length=30, min_length=6, write_only=True)
+    zip_address = serializers.CharField(validators=[valid_zipcode])
 
     class Meta:
         model = User

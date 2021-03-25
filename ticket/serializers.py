@@ -129,8 +129,9 @@ class TicketTermsApprovedSerializer(serializers.ModelSerializer):
 
 
 class TicketConnectorDetailSerializer(serializers.ModelSerializer):
-    pro = serializers.ChoiceField(choices=pro_user_feild())
+    # pro = serializers.ChoiceField(choices=pro_user_feild())
     connector = serializers.IntegerField(read_only=True)
+    pro = serializers.IntegerField()
     # service_type = serializers.SerializerMethodField()
     service_type = serializers.ChoiceField(choices=Ticket.SERVICE_TYPE_CHOICES)
 

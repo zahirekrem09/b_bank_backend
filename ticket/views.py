@@ -20,6 +20,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from bbank.pagination import SmallPagination, LargePagination
 from django_filters import rest_framework as djfilters
 from .filter import TicketFilter
+from geopy.distance import geodesic
 
 
 class CreateTicketsView(APIView):
@@ -247,3 +248,27 @@ class ImageView(APIView):
             return Response(arr, status=status.HTTP_201_CREATED)
         else:
             return Response(arr, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProDistList(APIView):
+    permission_classes = (permissions.IsAuthenticated, IsConnectorUser,)
+    pagination_class = SmallPagination
+    
+    def get(self, request, id):
+        ticket = get_object_or_404(Ticket, id=id)
+        client = User.objects.get(email=ticket.owner)
+        client_lat_long = (float(client.latitude), float(client.longitude))
+        pro = User.objects.filter(is_pro=True)
+        pro_dict_temp = {}
+        pro_list = []
+        for i in pro:
+            pro_lat_long = (float(i.latitude), float(i.longitude))
+            dist = geodesic(client_lat_long, pro_lat_long).km
+            pro_dict_temp["id"] = i.id
+            pro_dict_temp["distance"] = round(dist, 3)
+            pro_dict_temp["company_name"] = i.company_name
+            pro_dict_temp["phone"] = i.phone_number
+            pro_dict = pro_dict_temp.copy()
+            pro_list.append(pro_dict)
+        pro_list_sorted = sorted(pro_list, key=lambda i: i["distance"])
+        return Response(pro_list_sorted)
