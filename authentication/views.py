@@ -373,7 +373,7 @@ class UserListView(generics.ListAPIView):
     filter_backends = (filters.SearchFilter,
                        filters.OrderingFilter, djfilters.DjangoFilterBackend,)
     search_fields = ("username", 'email', 'first_name',
-                     'last_name', 'company_name')
+                     'last_name', 'company_name', 'address', 'phone_number', 'phone_number2', 'zip_address')
     ordering_fields = ['is_gray', 'is_client',
                        'is_pro', 'is_sponsor', 'is_connector']
     filterset_fields = ['is_gray', 'is_client',
@@ -391,7 +391,11 @@ class UserListView(generics.ListAPIView):
                 Q(username__icontains=keyword) |
                 Q(email__icontains=keyword) |
                 Q(first_name__icontains=keyword) |
-                Q(last_name__icontains=keyword)
+                Q(last_name__icontains=keyword) |
+                Q(address__icontains=keyword) |
+                Q(phone_number__icontains=keyword) |
+                Q(phone_number2__icontains=keyword) |
+                Q(zip_address__icontains=keyword)
             ).distinct()
 
             return queryset
