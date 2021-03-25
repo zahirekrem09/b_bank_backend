@@ -21,6 +21,7 @@ from bbank.pagination import SmallPagination, LargePagination
 from bbank.utils import EmailUtil
 from django.db.models import Q, Count, Subquery, OuterRef
 from rest_framework.permissions import AllowAny
+from django_filters import rest_framework as djfilters
 
 
 """
@@ -358,11 +359,14 @@ class UserListView(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated, IsConnectorUser,)
     pagination_class = SmallPagination
     # renderer_classes = (UserJSONRenderer,)
-    filter_backends = (filters.SearchFilter, filters.OrderingFilter,)
+    filter_backends = (filters.SearchFilter,
+                       filters.OrderingFilter, djfilters.DjangoFilterBackend,)
     search_fields = ("username", 'email', 'first_name',
                      'last_name', 'company_name')
     ordering_fields = ['is_gray', 'is_client',
                        'is_pro', 'is_sponsor', 'is_connector']
+    filterset_fields = ['is_gray', 'is_client',
+                        'is_pro', 'is_sponsor', 'is_connector']
     queryset = User.objects.all().order_by('-created_at')
     lookup_field = 'id'
 

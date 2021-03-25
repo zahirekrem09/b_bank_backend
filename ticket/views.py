@@ -18,7 +18,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.contrib.sites.shortcuts import get_current_site
 from rest_framework_simplejwt.tokens import RefreshToken
 from bbank.pagination import SmallPagination, LargePagination
-import jwt
+from django_filters import rest_framework as djfilters
+from .filter import TicketFilter
 
 
 class CreateTicketsView(APIView):
@@ -93,9 +94,13 @@ class TicketListView(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     pagination_class = SmallPagination
     queryset = Ticket.objects.all().order_by('-created_at')
-    filter_backends = (filters.SearchFilter, filters.OrderingFilter,)
+    filter_class = TicketFilter
+    filter_backends = (filters.SearchFilter,
+                       filters.OrderingFilter, djfilters.DjangoFilterBackend,)
     search_fields = ("owner__username", 'email', 'first_name',
                      'last_name', 'company_name')
+    # filterset_fields = ['is_gray', 'is_client',
+    #                     'is_pro', 'is_sponsor', 'is_connector']
     # ordering_fields = ['is_gray', 'is_client',
     #                    'is_pro', 'is_sponsor', 'is_connector']
     lookup_field = 'id'
