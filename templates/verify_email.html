@@ -178,7 +178,8 @@
                 "
               >
                 <h1 style="font-size: 48px; font-weight: 400; margin: 2">
-                  Welcome! {{user.first_name|upper }} {{user.last_name|upper }}
+                  Hello again ! {{user.first_name|title }}
+                  {{user.last_name|title }}
                 </h1>
                 <img
                   src="https://www.beautybank.nl/wp-content/uploads/2020/07/cropped-logo-bb-512x512-1.jpg"
@@ -233,7 +234,7 @@
                           <td
                             align="center"
                             style="border-radius: 3px"
-                            bgcolor="#F6CED9"
+                            bgcolor="#f69581"
                           >
                             <a
                               href="{{verify_link}}"
@@ -247,7 +248,7 @@
                                 text-decoration: none;
                                 padding: 15px 25px;
                                 border-radius: 2px;
-                                border: 1px solid #f6ced9;
+                                border: 1px solid #f69581;
                                 display: inline-block;
                               "
                               >Confirm Account</a
@@ -294,7 +295,7 @@
                   line-height: 25px;
                 "
               >
-                <p style="margin: 0; font-size: 8px">
+                <p style="margin: 0; font-size: 10px">
                   <a
                     href="{{verify_link}}"
                     target="_blank"
@@ -318,8 +319,8 @@
                 "
               >
                 <p style="margin: 0">
-                  If you have any questions, just reply to this email—we're
-                  always happy to help out.
+                  If you have further questions, send an email from (+the)
+                  contact page.
                 </p>
               </td>
             </tr>
