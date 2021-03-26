@@ -9,6 +9,7 @@ from django.utils.html import strip_tags
 from rest_framework.generics import get_object_or_404
 from django.utils import timezone
 from django.db.models import Q
+from decouple import config
 
 
 # class Pro(serializers.PrimaryKeyRelatedField):
@@ -153,7 +154,7 @@ class TicketConnectorDetailSerializer(serializers.ModelSerializer):
         instance.save()
 
         if instance.terms_approved == False:
-            FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
+            FRONTEND_URL = config('FRONTEND_URL')
             owner = User.objects.get(id=instance.owner.id)
 
             terms_approved_link = FRONTEND_URL + \
