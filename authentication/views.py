@@ -93,6 +93,11 @@ class ConnectorRegisterView(generics.GenericAPIView):
         user_data = serializer.data
         user = User.objects.get(email=user_data['email'])
         user.is_connector = True
+        user.zip_address = request.data['zip_address']
+        user.latitude = find_lat_long(user_data['zip_address']
+                                      )["geocodePoints"][0]["coordinates"][0]
+        user.longitude = find_lat_long(user_data['zip_address']
+                                       )["geocodePoints"][0]["coordinates"][1]
         user.save()
         EmailUtil.send_email(request, user)
         return Response(user_data, status=status.HTTP_201_CREATED)
@@ -116,6 +121,11 @@ class SponsorRegisterView(generics.GenericAPIView):
             user_data = serializer.data
             user = User.objects.get(email=user_data['email'])
             user.is_sponsor = True
+            user.zip_address = request.data['zip_address']
+            user.latitude = find_lat_long(user_data['zip_address']
+                                          )["geocodePoints"][0]["coordinates"][0]
+            user.longitude = find_lat_long(user_data['zip_address']
+                                           )["geocodePoints"][0]["coordinates"][1]
             user.save()
             EmailUtil.send_email(request, user)
 
