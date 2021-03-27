@@ -21,6 +21,7 @@ from bbank.pagination import SmallPagination, LargePagination
 from django_filters import rest_framework as djfilters
 from .filter import TicketFilter
 from geopy.distance import geodesic
+from decouple import config
 
 
 class CreateTicketsView(APIView):
@@ -33,8 +34,9 @@ class CreateTicketsView(APIView):
         ticket = Ticket.objects.create(owner=owner, email=owner.email,
                                        first_name=owner.first_name, last_name=owner.last_name, phone_number=owner.phone_number, about_me=owner.about_me, ** extra)
 
-        FRONTEND_URL = "https://beauty-bank-frontend.herokuapp.com/"
-        subject, from_email, to = 'Ticket Create Info', 'bbankdummymail@gmail.com', owner.email
+        FRONTEND_URL = config('FRONTEND_URL')
+        subject, from_email, to = 'Ticket Create Info', config(
+            'EMAIL_HOST_USER'), owner.email
         current_site = get_current_site(request).domain
         html_content = render_to_string('ticket_create_info.html', {
                                         'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': owner})
@@ -253,7 +255,7 @@ class ImageView(APIView):
 class ProDistList(APIView):
     permission_classes = (permissions.IsAuthenticated, IsConnectorUser,)
     pagination_class = SmallPagination
-    
+
     def get(self, request, id):
         ticket = get_object_or_404(Ticket, id=id)
         client = User.objects.get(email=ticket.owner)

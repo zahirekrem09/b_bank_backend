@@ -12,20 +12,15 @@ from django.db.models import Q
 from decouple import config
 
 
-# class Pro(serializers.PrimaryKeyRelatedField):
+# def pro_user_feild():
 
-#     def display_value(self, instance):
-#         return instance.username
+#     if User.objects.filter(is_pro=True).exists():
+#         pro_user = [(u.id, u.company_name)
+#                     for u in User.objects.filter(is_pro=True)]
+#     else:
+#         pro_user = []
 
-def pro_user_feild():
-
-    if User.objects.filter(is_pro=True).exists():
-        pro_user = [(u.id, u.company_name)
-                    for u in User.objects.filter(is_pro=True)]
-    else:
-        pro_user = []
-
-    return pro_user
+#     return pro_user
 
 
 class ImageSerializer(serializers.ModelSerializer):
@@ -170,7 +165,8 @@ class TicketConnectorDetailSerializer(serializers.ModelSerializer):
 
             terms_approved_link = FRONTEND_URL + \
                 'terms_approved/' + str(instance.id)
-            subject, from_email, to = 'Terms Approved', 'bbankdummymail@gmail.com', owner.email
+            subject, from_email, to = 'Terms Approved', config(
+                'EMAIL_HOST_USER'), owner.email
 
             html_content = render_to_string('terms_approved_link.html', {
                                             'terms_approved_link': terms_approved_link, 'user': owner, 'ticket': instance})
