@@ -73,6 +73,7 @@ class TicketSerializer(serializers.ModelSerializer):
     feedbacks = FeedbackSerializers(many=True)
     service_type = serializers.SerializerMethodField()
     pro_detail = serializers.SerializerMethodField()
+    connector_detail = serializers.SerializerMethodField()
     ticket_status = serializers.SerializerMethodField()
     feedback_url = serializers.HyperlinkedIdentityField(
         view_name='feedback',
@@ -105,6 +106,16 @@ class TicketSerializer(serializers.ModelSerializer):
         except:
             pass
 
+    def get_connector_detail(self, obj):
+        try:
+            connector_detail = get_object_or_404(User, pk=obj.connector)
+
+            serializer = UserTicketOwnerSerializer(connector_detail)
+            # print(serializer.data)
+            return serializer.data
+        except:
+            pass
+
     def get_ticket_status(self, obj):
         request = self.context['request']
         if(obj.terms_approved == True and obj.pro and obj.appointment_date and obj.appointment_date < timezone.now() and Feedback.objects.filter(ticket=obj, owner=request.user).exists()):
@@ -115,7 +126,7 @@ class TicketSerializer(serializers.ModelSerializer):
             return "3"
         elif(obj.terms_approved == True and obj.pro):
             return "2"
-        elif (obj.pro == True):
+        elif (obj.terms_approved == True):
             return "1"
         else:
             return "0"
