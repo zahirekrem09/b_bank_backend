@@ -41,7 +41,7 @@ def sent_mail():
 def start():
     scheduler = BackgroundScheduler()
     scheduler.add_job(sent_mail, 'interval',
-                      minutes=24*60, id="send_mail_001", replace_existing=True)
+                      minutes=1, id="send_mail_001", replace_existing=True)
     scheduler.start()
 
 
