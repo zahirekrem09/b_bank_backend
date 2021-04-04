@@ -54,12 +54,14 @@ class Ticket(models.Model):
     terms_approved = models.BooleanField(default=False)
     is_pro_confirm = models.BooleanField(default=False)
     is_client_confirm = models.BooleanField(default=False)
+    is_intake_call = models.BooleanField(default=False)
+    intake_call_date = models.DateTimeField(null=True, blank=True)
 
     # def __str__(self):
     #     return self.email
 
     class Meta:
-        ordering = ("created_at",)
+        ordering = ("created_at", "is_intake_call", "updated_at",)
 
 
 class Feedback(models.Model):

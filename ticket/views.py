@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .serializers import (
-    TicketSerializer, TicketClientDetailSerializer, TicketConnectorDetailSerializer, ImageSerializer, FeedbackCreateSerializers, FeedbackSerializers, TicketClientCreateSerializer, TicketTermsApprovedSerializer)
+    TicketSerializer, TicketClientDetailSerializer, TicketConnectorDetailSerializer, ImageSerializer, FeedbackCreateSerializers, FeedbackSerializers, TicketClientCreateSerializer, TicketTermsApprovedSerializer, TicketConnectorIntakeSerializer)
 from .models import FeedBackImage, Feedback, Ticket
 from .helpers import modify_input_for_multiple_files
 from django.shortcuts import render
@@ -150,6 +150,12 @@ class ConnectorTicketsDetailView(generics.RetrieveUpdateAPIView):
     queryset = Ticket.objects.all()
     lookup_field = 'id'
 
+
+class ConnectorTicketsIntakeView(generics.RetrieveUpdateAPIView):
+    serializer_class = TicketConnectorIntakeSerializer
+    permission_classes = (permissions.IsAuthenticated, IsConnectorUser,)
+    queryset = Ticket.objects.all()
+    lookup_field = 'id'
 
 # class FeedBackCreateView(generics.CreateAPIView):
 #     queryset = Feedback.objects.all()

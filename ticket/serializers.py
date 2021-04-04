@@ -145,9 +145,10 @@ class TicketConnectorDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ("id", "owner", "pro", "connector",
-                  "appointment_date", 'service_type')
+                  "appointment_date", 'service_type', 'intake_call_date', 'is_intake_call')
 
-        read_only_fields = ('appointment_date', 'owner', 'connector')
+        read_only_fields = ('appointment_date', 'owner',
+                            'connector', 'intake_call_date', 'is_intake_call')
 
     def get_service_type(self, obj):
         return obj.get_service_type_display()
@@ -157,6 +158,9 @@ class TicketConnectorDetailSerializer(serializers.ModelSerializer):
         instance.connector = request.user.id
         instance.pro = request.data.get("pro")
         instance.service_type = request.data.get("service_type")
+        # instance.intake_call_date = request.data.get("intake_call_date")
+        # instance.is_intake_call = request.data.get("is_intake_call")
+        print(request.data.get("service_type"))
         instance.save()
 
         if instance.terms_approved == False:
@@ -193,6 +197,16 @@ class TicketConnectorDetailSerializer(serializers.ModelSerializer):
         # msg.send()
 
         return instance
+
+
+class TicketConnectorIntakeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = ("id", "owner", "pro", "connector",
+                  "appointment_date", 'intake_call_date', 'is_intake_call')
+
+        read_only_fields = ('appointment_date', 'owner',
+                            'connector', 'pro', 'connector', 'owner',)
 
 
 class FeedbackCreateSerializers(serializers.ModelSerializer):
