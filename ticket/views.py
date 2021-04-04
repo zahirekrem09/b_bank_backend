@@ -153,7 +153,7 @@ class ConnectorTicketsDetailView(generics.RetrieveUpdateAPIView):
 
 class ConnectorTicketsIntakeView(generics.RetrieveUpdateAPIView):
     serializer_class = TicketConnectorIntakeSerializer
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAuthenticated, IsConnectorUser,)
     queryset = Ticket.objects.all()
     lookup_field = 'id'
 
