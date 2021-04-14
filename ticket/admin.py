@@ -9,7 +9,7 @@ class TicketAdmin(admin.ModelAdmin):
 
     list_display_links = ('first_name', 'last_name', 'email',)
 
-    list_filter = ('terms_approved', 'service_type', 'area',
+    list_filter = ('terms_approved', 'service_type', 'is_intake_call',
                    'appointment_date', 'created_at')
     empty_value_display = 'unknown'
     search_fields = ['first_name', 'last_name',
@@ -19,4 +19,4 @@ class TicketAdmin(admin.ModelAdmin):
 admin.site.register(Ticket, TicketAdmin)
 
 admin.site.register(Feedback)
-admin.site.register(FeedBackImage)
+# admin.site.register(FeedBackImage)
