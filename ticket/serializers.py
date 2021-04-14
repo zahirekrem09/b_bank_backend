@@ -209,6 +209,16 @@ class TicketConnectorIntakeSerializer(serializers.ModelSerializer):
                             'connector', 'pro', 'connector', 'owner',)
 
 
+class TicketClientActiveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = ("id", "owner", "pro", "connector",
+                  "appointment_date", 'is_active')
+
+        read_only_fields = ('appointment_date', 'owner',
+                            'connector', 'pro', 'connector', 'owner', "id")
+
+
 class FeedbackCreateSerializers(serializers.ModelSerializer):
     class Meta:
         model = Feedback

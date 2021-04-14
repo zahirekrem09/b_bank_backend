@@ -10,6 +10,13 @@ def user_directory_path(instance, filename):
     return 'profil_images/{0}/{1}'.format(instance.id, filename)
 
 
+class ServiceType(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
 class UserManager(BaseUserManager):
 
     def create_user(self, username,  email, first_name, last_name, gdpr_consent, phone_number, zip_address, password=None, **extra):
@@ -126,8 +133,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     address = models.CharField(max_length=300,  blank=True, null=True)
     zip_address = models.CharField(max_length=8)
     company_name = models.CharField(max_length=100, blank=True, null=True)
-    service_type = models.IntegerField(choices=SERVICE_TYPE_CHOICES,
-                                       default=SERVICE_TYPE_NOT_SPECIFIED)
+    # service_type = models.IntegerField(choices=SERVICE_TYPE_CHOICES,
+    #                                    default=SERVICE_TYPE_NOT_SPECIFIED)
     for_gender = models.IntegerField(choices=GENDER_CHOICES,
                                      default=GENDER_NOT_SPECIFIED)
     schedule_for_client = models.DateTimeField(auto_now=True)
@@ -162,6 +169,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_connector = models.BooleanField(default=False)
     gdpr_consent = models.BooleanField(default=False)
     min_incomer = models.BooleanField(default=False)
+    service_type = models.ManyToManyField(to=ServiceType)
 
     objects = UserManager()
 

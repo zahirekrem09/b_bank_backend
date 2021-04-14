@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
-from .models import User
+from .models import User, ServiceType
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -17,6 +17,7 @@ class UserAdmin(admin.ModelAdmin):
 
 
 admin.site.register(User, UserAdmin)
+admin.site.register(ServiceType)
 admin.site.unregister(Group)
 
 # Register your models here.

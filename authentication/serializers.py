@@ -1,14 +1,13 @@
-from rest_framework import serializers
+from rest_framework import fields, serializers
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-from .models import User, UserManager
+from .models import User, UserManager, ServiceType
 from django.contrib import auth
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .validate import valid_zipcode
-
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -21,6 +20,11 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['username'] = user.username
         token['email'] = user.email
         return token
+
+
+class ServiceTypeSerializers(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField()
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -50,6 +54,7 @@ class ProRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         max_length=30, min_length=6, write_only=True)
     zip_address = serializers.CharField(validators=[valid_zipcode])
+    # service_type = ServiceTypeSerializers(many=True)
 
     class Meta:
         model = User
@@ -66,7 +71,11 @@ class ProRegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        services = validated_data.pop('service_type')
+        pro = User.objects.create_user(**validated_data)
+        for service in services:
+            pro.service_type.add(service)
+        return pro
 
 
 class EmailVerificationSerializer(serializers.ModelSerializer):
@@ -196,7 +205,8 @@ class SetNewPasswordSerializer(serializers.Serializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    service_type = serializers.SerializerMethodField()
+    # service_type = serializers.SerializerMethodField()
+    service_type = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = User
@@ -204,8 +214,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
         # fields = '__all__'
         lookup_field = "username"
 
-    def get_service_type(self, obj):
-        return obj.get_service_type_display()
+    # def get_service_type(self, obj):
+    #     return obj.get_service_type_display()
 
 
 class UserTicketOwnerSerializer(serializers.ModelSerializer):

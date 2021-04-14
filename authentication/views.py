@@ -1,7 +1,7 @@
 from .serializers import (RegisterSerializer, EmailVerificationSerializer,
                           LoginSerializer, LogoutSerializer, ResetPasswordEmailRequestSerializer,
-                          SetNewPasswordSerializer, ProRegisterSerializer, UserDetailSerializer, MyTokenObtainPairSerializer, )
-from .models import User
+                          SetNewPasswordSerializer, ProRegisterSerializer, UserDetailSerializer, MyTokenObtainPairSerializer, ServiceTypeSerializers)
+from .models import ServiceType, User
 from .renderers import UserJSONRenderer
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
@@ -155,12 +155,18 @@ class ProRegisterView(generics.GenericAPIView):
             user.for_gender = request.data['for_gender']
             user.zip_address = request.data['zip_address']
             user.about_me = request.data['about_me']
-            user.service_type = request.data['service_type']
+
             user.reserved_capacity = request.data['reserved_capacity']
             user.latitude = find_lat_long(user_data['zip_address']
                                           )["geocodePoints"][0]["coordinates"][0]
             user.longitude = find_lat_long(user_data['zip_address']
                                            )["geocodePoints"][0]["coordinates"][1]
+
+            # user.service_type = request.data['service_type']
+            # print(request.data['service_type'])
+            # for service in request.data['service_type']:
+            #     obj = ServiceType.objects.get(id=service)
+            #     user.service_type.add(obj)
             user.save()
             EmailUtil.send_email(request, user)
             return Response(self.serializer_class(User.objects.get(email=user_data['email'])).data, status=status.HTTP_201_CREATED)
@@ -373,6 +379,12 @@ class ConnectorUserDetail(generics.RetrieveAPIView):
 @Permisson: Private just Connector 
 @Decs: User List   
 """
+
+
+class ServiceTypeView(generics.ListAPIView):
+    serializer_class = ServiceTypeSerializers
+    permission_classes = (AllowAny,)
+    queryset = ServiceType.objects.all()
 
 
 class UserListView(generics.ListAPIView):

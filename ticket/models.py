@@ -55,6 +55,7 @@ class Ticket(models.Model):
     is_pro_confirm = models.BooleanField(default=False)
     is_client_confirm = models.BooleanField(default=False)
     is_intake_call = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     intake_call_date = models.DateTimeField(null=True, blank=True)
 
     # def __str__(self):
