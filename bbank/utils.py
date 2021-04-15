@@ -14,7 +14,7 @@ class EmailUtil:
 
         token = RefreshToken.for_user(user).access_token
         if user.is_pro:
-            userRole = "pro"
+            userRole = "professional"
         elif user.is_client:
             userRole = "client"
         else:
