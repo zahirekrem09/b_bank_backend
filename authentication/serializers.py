@@ -206,7 +206,7 @@ class SetNewPasswordSerializer(serializers.Serializer):
 
 class UserDetailSerializer(serializers.ModelSerializer):
     # service_type = serializers.SerializerMethodField()
-    service_type = serializers.StringRelatedField(many=True)
+    # service_type = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = User

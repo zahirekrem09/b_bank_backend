@@ -13,7 +13,15 @@ class EmailUtil:
         FRONTEND_URL = config('FRONTEND_URL')
 
         token = RefreshToken.for_user(user).access_token
-        verify_link = FRONTEND_URL + 'email-verify/' + str(token)
+        if user.is_pro:
+            userRole = "pro"
+        elif user.is_client:
+            userRole = "client"
+        else:
+            userRole = "connector"
+
+        verify_link = FRONTEND_URL + 'email-verify/' + \
+            str(token) + "?userRole=" + userRole
         subject, from_email, to = 'Verify Your Email', config(
             'EMAIL_HOST_USER'), user.email
         current_site = get_current_site(request).domain
