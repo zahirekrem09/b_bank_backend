@@ -1,9 +1,12 @@
 import uuid
+import jwt
+from bbank.settings import SECRET_KEY
 from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin)
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
+from datetime import datetime, timedelta
 
 
 def user_directory_path(instance, filename):
@@ -189,6 +192,19 @@ class User(AbstractBaseUser, PermissionsMixin):
             'refresh': str(refresh),
             'access': str(refresh.access_token)
         }
+
+    def generated_jwt_token(self):
+        """
+        This method generates a JWT token that stores a user
+
+        """
+        exp_time = datetime.now() + timedelta(hours=3)
+        token = jwt.encode({
+            'id': self.pk,
+            'email': self.email,
+            'exp': int(exp_time.strftime('%s'))
+        }, SECRET_KEY, algorithm='HS256')
+        return token.decode('utf-8')
 
 
 # https://tech.serhatteker.com/post/2020-01/uuid-primary-key/

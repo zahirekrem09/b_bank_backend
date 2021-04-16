@@ -24,6 +24,10 @@ from django.db.models import Q, Count, Subquery, OuterRef
 from rest_framework.permissions import AllowAny
 from django_filters import rest_framework as djfilters
 from .coordinate import find_lat_long
+from decouple import config
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.core.mail import EmailMultiAlternatives
 
 
 """
@@ -271,6 +275,7 @@ class LogoutView(views.APIView):
 
 
 class RequestPasswordResetEmail(generics.GenericAPIView):
+
     serializer_class = ResetPasswordEmailRequestSerializer
     permission_classes = (AllowAny,)
 
@@ -280,19 +285,26 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
         email = request.data['email']
 
         if User.objects.filter(email=email).exists():
-            user = User.objects.get(email=email)
+            user = User.objects.filter(email=email).first()
             uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
-            token = PasswordResetTokenGenerator().make_token(user)
-            current_site = get_current_site(request=request).domain
-            relativeLink = reverse(
-                'password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token})
-            absurl = 'http://'+current_site+relativeLink
-            email_body = 'Hello '+user.username + \
-                ' Use the link below to reset your password \n' + absurl
-            data = {'email_body': email_body, 'to_email': user.email,
-                    'email_subject': 'Reset your password'}
 
-            Util.send_email(data)
+            token = PasswordResetTokenGenerator().make_token(user)
+            FRONTEND_URL = config('FRONTEND_URL')
+
+            verify_link = FRONTEND_URL + 'login?' + \
+                "token=" + str(token)+"&uidb64=" + \
+                str(uidb64) + "?resetPassword=true"
+
+            subject, from_email, to = 'Reset Your Password', config(
+                'EMAIL_HOST_USER'), user.email
+            current_site = get_current_site(request).domain
+            html_content = render_to_string('reset_password.html', {
+                                            'verify_link': verify_link, 'base_url': FRONTEND_URL, 'backend_url': current_site, 'user': user})
+            text_content = strip_tags(html_content)
+            msg = EmailMultiAlternatives(
+                subject, text_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
         return Response({'success': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
 
 
@@ -312,7 +324,6 @@ class PasswordTokenCheckAPI(generics.GenericAPIView):
         try:
             id = smart_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(id=id)
-
             if not PasswordResetTokenGenerator().check_token(user, token):
                 return Response({'error': 'Token is not valid, please request a new one'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -338,6 +349,58 @@ class SetNewPasswordAPIView(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response({'success': True, 'message': 'Password reset success'}, status=status.HTTP_200_OK)
+
+
+# class PassordResetRequestView(GenericAPIView):
+#     """
+#     allow users to request for a password reset token provided the email is valid
+#     """
+#     permission_classes = (AllowAny,)
+#     serializer_class = PasswordResetResquestSerializer
+
+#     def post(self, request, *args, **kwargs):
+#         email = request.data.get('email')
+#         user = User.objects.filter(email=email).first()
+#         if user:
+#             token = user.generated_jwt_token()
+#             user.send_password_reset_link(request, token)
+#             return Response(
+#                 {'message': 'password reset link has been sent to your email'},
+#                 status=status.HTTP_200_OK
+#             )
+#         else:
+#             return Response({'error': 'the email does not match any account'},
+#                             status=status.HTTP_400_BAD_REQUEST
+#                             )
+
+
+# class PasswordResetView(GenericAPIView):
+#     permission_classes = (AllowAny,)
+#     serializer_class = PasswordResetSerializser
+
+#     def put(self, request, *args, **kwargs):
+#         token = kwargs.pop('token')
+#         try:
+#             user = jwt.decode(token, SECRET_KEY)
+#         except jwt.ExpiredSignatureError:
+#             return Response({'error': 'token expired'})
+#         user_detail = User.objects.get(pk=user['id'])
+#         data = request.data.get('user', {})
+#         if data['password'] == data['confirmpassword']:
+#             serializer = self.serializer_class(user_detail, data=data)
+#             serializer.is_valid(raise_exception=True)
+#             user_detail.set_password(data['password'])
+#             user_detail.save()
+#             return Response(
+#                 {"message": "your password has been reset successfully"},
+#                 status=status.HTTP_200_OK
+#             )
+
+#         else:
+#             return Response(
+#                 {"error": "password and confirm password fields do not match"},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
 
 
 """

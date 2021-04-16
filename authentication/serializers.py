@@ -188,6 +188,8 @@ class SetNewPasswordSerializer(serializers.Serializer):
             uidb64 = attrs.get('uidb64')
 
             id = force_str(urlsafe_base64_decode(uidb64))
+            print(id)
+            print(token)
             user = User.objects.get(id=id)
 
             if not PasswordResetTokenGenerator().check_token(user, token):
@@ -247,3 +249,27 @@ class UserTicketProSerializer(serializers.Serializer):
     company_name = serializers.CharField()
     phone_number = serializers.CharField()
     phone_number2 = serializers.CharField()
+
+
+# class PasswordResetSerializser(serializers.ModelSerializer):
+#     password = serializers.CharField(
+#         required=True, min_length=8, write_only=True)
+#     confirmpassword = serializers.CharField(
+#         required=True, min_length=8, write_only=True)
+
+#     class Meta:
+#         model = User
+#         fields = ('password', 'confirmpassword')
+
+#     def validate_password(self, value):
+#         if value is None:
+#             raise serializers.ValidationError(
+#                 'please enter your password here'
+#             )
+#         return value
+
+
+# class PasswordResetResquestSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ('email',)
