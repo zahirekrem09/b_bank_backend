@@ -305,7 +305,8 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
                 subject, text_content, from_email, [to])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
-        return Response({'success': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
+            return Response({'success': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 """

@@ -209,6 +209,7 @@ class SetNewPasswordSerializer(serializers.Serializer):
 class UserDetailSerializer(serializers.ModelSerializer):
     # service_type = serializers.SerializerMethodField()
     # service_type = serializers.StringRelatedField(many=True)
+    # gender = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -218,6 +219,9 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     # def get_service_type(self, obj):
     #     return obj.get_service_type_display()
+
+    # def get_gender(self, obj):
+    #     return obj.get_gender_display()
 
 
 class UserTicketOwnerSerializer(serializers.ModelSerializer):
