@@ -15,7 +15,7 @@ urlpatterns = [
     path('connector-user-detail/<str:username>',
          ConnectorUserDetail.as_view(), name='connector-user-detail'),
     path('email-verify/', VerifyEmail.as_view(), name='email-verify'),
-    path('request-reset-email', RequestPasswordResetEmail.as_view(),
+    path('reset-email', RequestPasswordResetEmail.as_view(),
          name='request-reset-email'),
     path('password-reset/<uidb64>/<token>/',
          PasswordTokenCheckAPI.as_view(), name='password-reset-confirm'),
