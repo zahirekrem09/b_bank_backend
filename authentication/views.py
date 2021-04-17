@@ -293,7 +293,7 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
 
             verify_link = FRONTEND_URL + 'login?' + \
                 "token=" + str(token)+"&uidb64=" + \
-                str(uidb64) + "?resetPassword=true"
+                str(uidb64) + "&?resetPassword=true"
 
             subject, from_email, to = 'Reset Your Password', config(
                 'EMAIL_HOST_USER'), user.email
