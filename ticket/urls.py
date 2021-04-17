@@ -11,6 +11,8 @@ urlpatterns = [
          name='client-tickets-detail'),
     path('client-tickets/<int:id>', ClientTicketsDetailView.as_view(),
          name='client-tickets-detail'),
+    path('connector-tickets/<int:id>', ConnectorTicketsDetailView.as_view(),
+         name='connector-tickets-detail'),
     path('client-active/<int:id>', ClientTicketsActiveView.as_view(),
          name='client-active'),
     path('connector-intake/<int:id>', ConnectorTicketsIntakeView.as_view(),
