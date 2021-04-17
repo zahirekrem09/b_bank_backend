@@ -172,7 +172,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_connector = models.BooleanField(default=False)
     gdpr_consent = models.BooleanField(default=False)
     min_incomer = models.BooleanField(default=False)
-    service_type = models.ManyToManyField(to=ServiceType, null=True)
+    service_type = models.ManyToManyField(to=ServiceType)
 
     objects = UserManager()
 
