@@ -5,15 +5,15 @@ from .models import User, ServiceType
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name', 'email',
-                    'is_pro', 'is_client', 'is_connector', 'is_sponsor', 'created_at')
+                    'is_pro', 'is_client', 'is_connector', 'is_sponsor', 'created_at', )
 
     list_display_links = ('first_name', 'last_name', 'email',)
 
     list_filter = ('is_pro', 'is_client', 'is_connector',
-                   'is_sponsor', 'created_at')
+                   'is_sponsor', 'created_at', "service_type")
     empty_value_display = 'unknown'
     search_fields = ['first_name', 'last_name',
-                     'email', 'company_name', 'zip_address', 'address']
+                     'email', 'company_name', 'zip_address', 'address', "service_type"]
 
 
 admin.site.register(User, UserAdmin)

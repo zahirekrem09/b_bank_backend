@@ -16,7 +16,19 @@ class TicketAdmin(admin.ModelAdmin):
                      'email', 'owner__zip_address', 'owner__address']
 
 
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ('owner', 'ticket', 'created_at', )
+
+    list_display_links = ('owner', 'ticket',)
+
+    list_filter = ('created_at', "owner", "ticket")
+
+    empty_value_display = 'unknown'
+    search_fields = ['owner__first_name', 'owner__last_name',
+                     'owner__email', 'owner__zip_address', 'owner__address']
+
+
 admin.site.register(Ticket, TicketAdmin)
 
-admin.site.register(Feedback)
-# admin.site.register(FeedBackImage)
+admin.site.register(Feedback, FeedbackAdmin)
+admin.site.register(FeedBackImage)
