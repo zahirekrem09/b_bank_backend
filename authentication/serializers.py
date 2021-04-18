@@ -216,6 +216,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
         exclude = ("password", )
         # fields = '__all__'
         lookup_field = "username"
+        read_only_fields = ('zip_address',)
 
     # def get_service_type(self, obj):
     #     return obj.get_service_type_display()
@@ -232,7 +233,7 @@ class UserTicketOwnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "username", "email", "first_name",
-                  "last_name", "gender", "zip_address", "phone_number", "phone_number2", "about_me", "transportation_type", "preferred_lang", "gdpr_consent", "is_gray", "company_name", "address")
+                  "last_name", "gender", "zip_address", "phone_number", "phone_number2", "about_me", "transportation_type", "preferred_lang", "gdpr_consent", "is_gray", "company_name", "address", "min_incomer")
 
     def get_gender(self, obj):
         return obj.get_gender_display()
