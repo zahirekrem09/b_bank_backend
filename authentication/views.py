@@ -1,7 +1,9 @@
+from django.db.models.expressions import F
 from .serializers import (RegisterSerializer, EmailVerificationSerializer,
                           LoginSerializer, LogoutSerializer, ResetPasswordEmailRequestSerializer,
                           SetNewPasswordSerializer, ProRegisterSerializer, UserDetailSerializer, MyTokenObtainPairSerializer, ServiceTypeSerializers)
 from .models import ServiceType, User
+from ticket.models import Ticket, Feedback
 from .renderers import UserJSONRenderer
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
@@ -28,6 +30,7 @@ from decouple import config
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives
+from rest_framework.views import APIView
 
 
 """
@@ -423,6 +426,44 @@ class UserDetail(generics.RetrieveUpdateAPIView):
         username = self.kwargs["username"]
         queryset = queryset.filter(username=username)
         return queryset
+
+
+class UserRemoveView(APIView):
+    permission_classes = (permissions.IsAuthenticated, IsCurrentUser)
+    #serializer_class = serializer_class = UserDetailSerializer
+
+    def post(self, request, **extra):
+        #serializer = self.serializer_class(data=request.data)
+        current_user = User.objects.get(username=request.user.username)
+        current_user.email = f"xxxx{current_user.id}@mail.com"
+        current_user.username = f"xxxx{current_user.id}"
+        current_user.first_name = "xxxx"
+        current_user.last_name = "xxxx"
+        current_user.address = "xxxx"
+        current_user.zip_address = "xxxx"
+        current_user.company_name = "xxxx"
+        current_user.phone_number = "xxxx"
+        current_user.phone_number2 = "xxxx"
+        current_user.about_me = "xxxx"
+        current_user.profile_image = None
+        current_user.is_active = False
+        current_user.is_verified = False
+        current_user.is_staff = False
+        current_user.save()
+        tickets = Ticket.objects.filter(owner=request.user)
+        for ticket in tickets:
+            ticket.email = f"xxxx{current_user.id}@mail.com"
+            ticket.first_name = "xxxx"
+            ticket.last_name = "xxxx"
+            ticket.phone_number = "xxxx"
+            ticket.phone_number2 = "xxxx"
+            ticket.about_me = "xxxx"
+            ticket.save()
+
+        data = {
+            "messages": "Remove Successfuly"}
+
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class ConnectorUserDetail(generics.RetrieveAPIView):
