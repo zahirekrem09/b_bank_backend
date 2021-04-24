@@ -4,10 +4,10 @@ from .models import User, ServiceType
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'email',
+    list_display = ('id', 'first_name', 'last_name',
                     'is_pro', 'is_client', 'is_connector', 'is_sponsor', 'created_at', )
 
-    list_display_links = ('first_name', 'last_name', 'email',)
+    list_display_links = ('id', 'first_name', 'last_name',)
 
     list_filter = ('is_pro', 'is_client', 'is_connector',
                    'is_sponsor', 'created_at', "service_type")

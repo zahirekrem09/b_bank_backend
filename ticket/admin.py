@@ -4,10 +4,11 @@ from .models import Ticket, Feedback, FeedBackImage
 
 
 class TicketAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'email',
+
+    list_display = ('first_name', 'last_name',
                     'appointment_date', 'service_type', 'created_at', )
 
-    list_display_links = ('first_name', 'last_name', 'email',)
+    list_display_links = ('first_name', 'last_name',)
 
     list_filter = ('terms_approved', 'service_type', 'is_intake_call',
                    'appointment_date', 'created_at')
@@ -17,11 +18,12 @@ class TicketAdmin(admin.ModelAdmin):
 
 
 class FeedbackAdmin(admin.ModelAdmin):
-    list_display = ('owner', 'ticket', 'created_at', )
 
-    list_display_links = ('owner', 'ticket',)
+    list_display = ('owner_id', 'ticket_id', 'created_at', )
 
-    list_filter = ('created_at', "owner", "ticket")
+    list_display_links = ('owner_id', 'ticket_id',)
+
+    #list_filter = ('created_at', "owner", "ticket")
 
     empty_value_display = 'unknown'
     search_fields = ['owner__first_name', 'owner__last_name',
