@@ -1,12 +1,34 @@
 
 from django.contrib import admin
 from .models import Ticket, Feedback, FeedBackImage
+from authentication.models import User
+
+
+class OwnerTabularInline(admin.TabularInline):
+    model = User
+
+
+class FeedbackTabularInline(admin.TabularInline):
+    model = Feedback
+    extra = 1
+    classes = ('collapse',)
+
+
+class TicketTabularInline(admin.TabularInline):
+    model = Ticket
+
+
+class FeedbackImageTabularInline(admin.TabularInline):
+    model = FeedBackImage
+    classes = ('collapse',)
+    extra = 1
 
 
 class TicketAdmin(admin.ModelAdmin):
+    inlines = [FeedbackTabularInline]
 
     list_display = ('first_name', 'last_name',
-                    'appointment_date', 'service_type', 'created_at', )
+                    'appointment_date', 'service_type', 'created_at', 'feedback_count')
 
     list_display_links = ('first_name', 'last_name',)
 
@@ -16,8 +38,11 @@ class TicketAdmin(admin.ModelAdmin):
     search_fields = ['first_name', 'last_name',
                      'email', 'owner__zip_address', 'owner__address']
 
+    raw_id_fields = ('owner', )
+
 
 class FeedbackAdmin(admin.ModelAdmin):
+    inlines = [FeedbackImageTabularInline]
 
     list_display = ('owner_id', 'ticket_id', 'created_at', )
 
@@ -28,6 +53,8 @@ class FeedbackAdmin(admin.ModelAdmin):
     empty_value_display = 'unknown'
     search_fields = ['owner__first_name', 'owner__last_name',
                      'owner__email', 'owner__zip_address', 'owner__address']
+
+    raw_id_fields = ('owner', 'ticket')
 
 
 admin.site.register(Ticket, TicketAdmin)

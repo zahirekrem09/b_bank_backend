@@ -1,0 +1,44 @@
+{% extends 'admin/base.html' %} {% block branding %}
+<h1 id="head">Beauty Bank</h1>
+{% endblock %} {% block extrastyle %}
+<style>
+  #header {
+    height: 50px;
+    background: #10284e;
+    color: #fff;
+  }
+
+  #branding h1 {
+    color: #fff;
+  }
+
+  a:link,
+  a:visited {
+    color: #10284e;
+  }
+
+  div.breadcrumbs {
+    background: #f50157;
+    color: #10284e;
+  }
+
+  div.breadcrumbs a {
+    color: #333;
+  }
+
+  .module h2,
+  .module caption,
+  .inline-group h2 {
+    background: #f50157;
+  }
+
+  .button,
+  input[type="submit"],
+  input[type="button"],
+  .submit-row input,
+  a.button {
+    background: #10284e;
+    color: #fff;
+  }
+</style>
+{% endblock %}

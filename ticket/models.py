@@ -1,5 +1,6 @@
 from django.db import models
 from authentication.models import User
+from django.utils.safestring import mark_safe
 
 
 # def user_directory_path(instance, filename):
@@ -33,7 +34,7 @@ class Ticket(models.Model):
 
     )
     owner = models.ForeignKey(
-        User, related_name='owner', on_delete=models.CASCADE)
+        User, related_name='tickets', on_delete=models.CASCADE)
     email = models.EmailField(max_length=250)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -61,6 +62,11 @@ class Ticket(models.Model):
     # def __str__(self):
     #     return self.email
 
+    @property
+    def feedback_count(self):
+        count = self.feedbacks.count()
+        return count
+
     class Meta:
         ordering = ("created_at", "is_intake_call", "updated_at",)
 
@@ -73,6 +79,12 @@ class Feedback(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     content = models.TextField(max_length=1500)
+
+    # @property
+    # def feedback_images(self):
+    #     images = self.feedback_images
+    #     for i in images:
+    #         return mark_safe(f"<img src={i.image.url} width=400 height=400></img>")
 
     class Meta:
         ordering = ("created_at",)

@@ -186,6 +186,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         ordering = ("created_at",)
 
+    @property
+    def ticket_count(self):
+        count = self.tickets.count()
+        return count
+
     def tokens(self):
         refresh = RefreshToken.for_user(self)
         return {
@@ -205,8 +210,3 @@ class User(AbstractBaseUser, PermissionsMixin):
             'exp': int(exp_time.strftime('%s'))
         }, SECRET_KEY, algorithm='HS256')
         return token.decode('utf-8')
-
-
-# https://tech.serhatteker.com/post/2020-01/uuid-primary-key/
-# class ModelUsingUUID(models.Model):
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

@@ -1,11 +1,30 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 from .models import User, ServiceType
+from ticket.models import Feedback, Ticket, FeedBackImage
+
+
+class TicketTabularInline(admin.TabularInline):
+    model = Ticket
+    extra = 1
+    classes = ('collapse',)
+
+
+class FeedbackTabularInline(admin.TabularInline):
+    model = Feedback
+    extra = 1
+    classes = ('collapse',)
+
+
+class FeedbackImageTabularInline(admin.TabularInline):
+    model = FeedBackImage
 
 
 class UserAdmin(admin.ModelAdmin):
+    inlines = [TicketTabularInline,
+               FeedbackTabularInline]
     list_display = ('id', 'first_name', 'last_name',
-                    'is_pro', 'is_client', 'is_connector', 'is_sponsor', 'created_at', )
+                    'is_pro', 'is_client', 'is_connector', 'is_sponsor', 'created_at', 'ticket_count')
 
     list_display_links = ('id', 'first_name', 'last_name',)
 
@@ -14,6 +33,8 @@ class UserAdmin(admin.ModelAdmin):
     empty_value_display = 'unknown'
     search_fields = ['first_name', 'last_name',
                      'email', 'company_name', 'zip_address', 'address', "service_type"]
+
+    filter_horizontal = ('service_type',)
 
 
 admin.site.register(User, UserAdmin)
