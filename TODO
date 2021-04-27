@@ -23,7 +23,7 @@ class ActivateUserAPIView(GenericAPIView):
 
 
 
-# Database
+# Database postgresql
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DB_NAME = config("DB_NAME")
@@ -42,3 +42,23 @@ DATABASES = {
         'PORT': DB_PORT,
     }
 }
+
+mssql
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'sql_server.pyodbc',
+        'NAME': 'mydb',
+        'USER': 'user@myserver',
+        'PASSWORD': 'password',
+        'HOST': 'myserver.database.windows.net',
+        'PORT': '',
+
+        'OPTIONS': {
+            'driver': 'ODBC Driver 13 for SQL Server',
+        },
+    },
+}
+
+# set this to False if you want to turn off pyodbc's connection pooling
+DATABASE_CONNECTION_POOLING = False
