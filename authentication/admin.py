@@ -41,8 +41,8 @@ class UserAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 admin.site.register(ServiceType)
 admin.site.unregister(Group)
-admin.site.unregister(BlacklistedToken)
-admin.site.unregister(OutstandingToken)
+# admin.site.unregister(BlacklistedToken)
+# admin.site.unregister(OutstandingToken)
 
 
 # Register your models here.
