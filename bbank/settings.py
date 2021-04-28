@@ -150,7 +150,9 @@ DATABASES = {
         'HOST': DB_HOST,
         'PORT': DB_PORT,
         'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server'
+            'driver': 'ODBC Driver 17 for SQL Server',
+            'dsn': "bbvms",
+            'use_legacy_datetime': True,
         },
     },
 }
