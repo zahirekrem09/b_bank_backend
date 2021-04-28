@@ -124,11 +124,11 @@ DATABASES = {
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-# DB_NAME = config("DB_NAME")
-# DB_USER = config("DB_USER")
-# DB_PASSWORD = config("DB_PASSWORD")
-# DB_HOST = config("DB_HOST")
-# DB_PORT = config("DB_PORT")
+DB_NAME = config("DB_NAME")
+DB_USER = config("DB_USER")
+DB_PASSWORD = config("DB_PASSWORD")
+DB_HOST = config("DB_HOST")
+DB_PORT = config("DB_PORT")
 
 # DATABASES = {
 #     'default': {
@@ -140,6 +140,21 @@ DATABASES = {
 #         'PORT': DB_PORT,
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'sql_server.pyodbc',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server'
+        },
+    },
+}
+DATABASE_CONNECTION_POOLING = False
 
 
 # rest framwork settings
@@ -189,7 +204,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-# TODo timezone değişicek
+
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
