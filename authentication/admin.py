@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from .models import User, ServiceType
 from ticket.models import Feedback, Ticket, FeedBackImage
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
 
 
 class TicketTabularInline(admin.TabularInline):
@@ -40,6 +41,9 @@ class UserAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 admin.site.register(ServiceType)
 admin.site.unregister(Group)
+admin.site.unregister(BlacklistedToken)
+admin.site.unregister(OutstandingToken)
+
 
 # Register your models here.
 
