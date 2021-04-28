@@ -151,7 +151,7 @@ DATABASES = {
         'PORT': DB_PORT,
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
-            'dsn': "bbvms",
+
             'use_legacy_datetime': True,
         },
     },
