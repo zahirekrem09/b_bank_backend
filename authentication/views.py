@@ -78,7 +78,12 @@ class RegisterView(generics.GenericAPIView):
         #     ' Use the link below to verify your email \n' + absurl
         # data = {'email_body': email_body, 'to_email': user.email,
         #         'email_subject': 'Verify your email'}
-        EmailUtil.send_email(request, user)
+
+        try:
+            EmailUtil.send_email(request, user)
+        except:
+            return Response({'detail': 'Couldn not send email'}, status=status.HTTP_400_BAD_REQUEST)
+
         return Response(user_data, status=status.HTTP_201_CREATED)
 
 
@@ -106,7 +111,10 @@ class ConnectorRegisterView(generics.GenericAPIView):
         user.longitude = find_lat_long(user_data['zip_address']
                                        )["geocodePoints"][0]["coordinates"][1]
         user.save()
-        EmailUtil.send_email(request, user)
+        try:
+            EmailUtil.send_email(request, user)
+        except:
+            return Response({'detail': 'Couldn not send email'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(user_data, status=status.HTTP_201_CREATED)
 
 
@@ -134,7 +142,10 @@ class SponsorRegisterView(generics.GenericAPIView):
             user.longitude = find_lat_long(user_data['zip_address']
                                            )["geocodePoints"][0]["coordinates"][1]
             user.save()
-            EmailUtil.send_email(request, user)
+            try:
+                EmailUtil.send_email(request, user)
+            except:
+                return Response({'detail': 'Couldn not send email'}, status=status.HTTP_400_BAD_REQUEST)
 
             return Response(user_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -175,7 +186,10 @@ class ProRegisterView(generics.GenericAPIView):
             #     obj = ServiceType.objects.get(id=service)
             #     user.service_type.add(obj)
             user.save()
-            EmailUtil.send_email(request, user)
+            try:
+                EmailUtil.send_email(request, user)
+            except:
+                return Response({'detail': 'Couldn not send email'}, status=status.HTTP_400_BAD_REQUEST)
             return Response(self.serializer_class(User.objects.get(email=user_data['email'])).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

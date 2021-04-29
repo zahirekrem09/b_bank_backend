@@ -43,7 +43,10 @@ class CreateTicketsView(APIView):
         text_content = strip_tags(html_content)
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
         msg.attach_alternative(html_content, "text/html")
-        msg.send()
+        try:
+            msg.send()
+        except:
+            return Response({'detail': 'Couldn not send email'}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(TicketSerializer(ticket, context={'request': request}).data, status=status.HTTP_201_CREATED)
 
