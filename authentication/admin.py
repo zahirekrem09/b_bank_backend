@@ -33,7 +33,7 @@ class UserAdmin(admin.ModelAdmin):
                    'is_sponsor', 'created_at', "service_type")
     empty_value_display = 'unknown'
     search_fields = ['first_name', 'last_name',
-                     'email', 'company_name', 'zip_address', 'address', "service_type"]
+                     'email', 'company_name', 'zip_address', 'address', "service_type__name"]
 
     filter_horizontal = ('service_type',)
 
