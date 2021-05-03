@@ -15,6 +15,7 @@ Django==3.0.10
 django-cors-headers==3.6.0
 django-filter==2.4.0
 django-heroku==0.3.1
+django-mssql-backend==2.8.1
 django-storages==1.11.1
 djangorestframework==3.12.2
 djangorestframework-simplejwt
@@ -34,6 +35,7 @@ psycopg2-binary==2.8.6
 pycodestyle==2.6.0
 pycparser==2.20
 PyJWT==1.7.1
+pyodbc==4.0.30
 pyparsing==2.4.7
 python-dateutil==2.8.1
 python-decouple==3.3
